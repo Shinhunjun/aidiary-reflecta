@@ -385,46 +385,6 @@ const DemoLanding = () => {
         </div>
       </section>
 
-      {/* What You'll See Section */}
-      <section className="demo-section demo-preview-section">
-        <div className="demo-container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="demo-section-title">What You'll See in the Demo</h2>
-
-            <div className="demo-preview-grid">
-              <div className="demo-preview-item">
-                <div className="demo-preview-number">01</div>
-                <h3>Pre-loaded Mandalart Goals</h3>
-                <p>9 life areas with 72 actionable tasks already set up</p>
-              </div>
-
-              <div className="demo-preview-item">
-                <div className="demo-preview-number">02</div>
-                <h3>15 Diverse Journal Entries</h3>
-                <p>Real examples of chat-to-diary conversions with mood tracking</p>
-              </div>
-
-              <div className="demo-preview-item">
-                <div className="demo-preview-number">03</div>
-                <h3>AI-Generated Insights</h3>
-                <p>Word clouds, progress charts, and goal-emotion correlations</p>
-              </div>
-
-              <div className="demo-preview-item">
-                <div className="demo-preview-number">04</div>
-                <h3>6 AI Personas Ready</h3>
-                <p>Try different conversation styles and create your own</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Final CTA Section */}
       <section className="demo-section demo-final-cta">
         <div className="demo-container">
@@ -436,9 +396,6 @@ const DemoLanding = () => {
             className="demo-final-cta-content"
           >
             <h2>Ready to Experience the Future of Personal Growth?</h2>
-            <p>
-              No credit card required. No lengthy signup. Just click and explore.
-            </p>
 
             <div className="demo-final-cta-actions">
               <button
@@ -457,10 +414,6 @@ const DemoLanding = () => {
                   </>
                 )}
               </button>
-
-              <p className="demo-final-note">
-                Takes less than 5 seconds • Full features unlocked • Real data included
-              </p>
             </div>
 
             {error && (
