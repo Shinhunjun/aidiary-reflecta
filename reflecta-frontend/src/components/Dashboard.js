@@ -26,6 +26,10 @@ const Dashboard = () => {
   const [loadingJournalSummary, setLoadingJournalSummary] = useState(false);
   const [loadingChildrenSummary, setLoadingChildrenSummary] = useState(false);
   const [loadingJournalEntries, setLoadingJournalEntries] = useState(false);
+  // Main goal AI summaries for dashboard display
+  const [mainGoalJournalSummary, setMainGoalJournalSummary] = useState(null);
+  const [mainGoalChildrenSummary, setMainGoalChildrenSummary] = useState(null);
+  const [loadingMainSummaries, setLoadingMainSummaries] = useState(false);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -130,6 +134,38 @@ const Dashboard = () => {
 
     fetchJournalEntries();
   }, [selectedGoalId]);
+
+  // Fetch main goal AI summaries for dashboard display
+  useEffect(() => {
+    const fetchMainGoalSummaries = async () => {
+      if (!goalId) {
+        setMainGoalJournalSummary(null);
+        setMainGoalChildrenSummary(null);
+        return;
+      }
+
+      try {
+        setLoadingMainSummaries(true);
+
+        // Fetch both summaries in parallel
+        const [journalSum, childrenSum] = await Promise.all([
+          apiService.getGoalJournalSummary(goalId),
+          apiService.getGoalChildrenSummary(goalId)
+        ]);
+
+        setMainGoalJournalSummary(journalSum);
+        setMainGoalChildrenSummary(childrenSum);
+      } catch (error) {
+        console.error("Failed to fetch main goal summaries:", error);
+        setMainGoalJournalSummary(null);
+        setMainGoalChildrenSummary(null);
+      } finally {
+        setLoadingMainSummaries(false);
+      }
+    };
+
+    fetchMainGoalSummaries();
+  }, [goalId]);
 
   const handleGoalClick = (goal) => {
     setSelectedGoalId(goal.id);
@@ -273,15 +309,57 @@ const Dashboard = () => {
           {goals && goalId && (
             <>
               <div className="dashboard-section">
-                <h2>📊 Progress at a Glance</h2>
+                <h2>🤖 AI Goal Progress Summary</h2>
                 <p className="section-subtitle">
-                  Overview of your main goal's progress
+                  AI-powered insights on your goal journey
                 </p>
-                <CompletionRings
-                  goalId={goalId}
-                  mandalartData={goals}
-                  apiService={apiService}
-                />
+                {loadingMainSummaries ? (
+                  <div className="loading-placeholder">
+                    <p>Loading AI insights...</p>
+                  </div>
+                ) : mainGoalJournalSummary || mainGoalChildrenSummary ? (
+                  <div className="ai-summary-container">
+                    {/* Journal Summary Section */}
+                    {mainGoalJournalSummary?.summary && (
+                      <div className="ai-summary-card">
+                        <h3>📝 Journal Insights</h3>
+                        <p className="ai-summary-text">{mainGoalJournalSummary.summary}</p>
+                        <div className="summary-meta">
+                          {mainGoalJournalSummary.entryCount && (
+                            <span>📊 {mainGoalJournalSummary.entryCount} entries</span>
+                          )}
+                          {mainGoalJournalSummary.dateRange && (
+                            <span>
+                              📅 {mainGoalJournalSummary.dateRange.start} to {mainGoalJournalSummary.dateRange.end}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Children Summary Section */}
+                    {mainGoalChildrenSummary?.summary && (
+                      <div className="ai-summary-card">
+                        <h3>🎯 Sub-Goals Progress</h3>
+                        <p className="ai-summary-text">{mainGoalChildrenSummary.summary}</p>
+                        <div className="summary-meta">
+                          {mainGoalChildrenSummary.totalEntries && (
+                            <span>📝 {mainGoalChildrenSummary.totalEntries} total entries</span>
+                          )}
+                          {mainGoalChildrenSummary.childGoalsSummaries && (
+                            <span>
+                              🎯 {mainGoalChildrenSummary.childGoalsSummaries.length} active sub-goals
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="empty-state">
+                    <p>Start journaling to see AI-generated progress insights!</p>
+                  </div>
+                )}
               </div>
 
               <div className="dashboard-section">
