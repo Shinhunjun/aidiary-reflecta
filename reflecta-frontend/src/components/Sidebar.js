@@ -104,6 +104,18 @@ const Sidebar = () => {
           </NavLink>
         </motion.div>
 
+        <motion.div variants={linkVariants} whileHover="hover">
+          <NavLink
+            to="/demo"
+            className={({ isActive }) =>
+              `sidebar-link ${isActive ? "active" : ""}`
+            }
+          >
+            <span className="sidebar-icon">🎬</span>
+            <span className="sidebar-label">Demo</span>
+          </NavLink>
+        </motion.div>
+
         {isAuthenticated ? (
           <>
             <motion.div variants={linkVariants} whileHover="hover">

@@ -17,8 +17,16 @@ export const SidebarProvider = ({ children }) => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const collapseSidebar = () => {
+    setIsCollapsed(true);
+  };
+
+  const expandSidebar = () => {
+    setIsCollapsed(false);
+  };
+
   return (
-    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar }}>
+    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar, collapseSidebar, expandSidebar }}>
       {children}
     </SidebarContext.Provider>
   );

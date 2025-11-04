@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
+import { useSidebar } from "../contexts/SidebarContext";
 import "./DemoLanding.css";
 
 const DemoLanding = () => {
   const navigate = useNavigate();
   const { loginAsDemo } = useAuth();
+  const { collapseSidebar } = useSidebar();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Collapse sidebar when demo landing page mounts
+  useEffect(() => {
+    collapseSidebar();
+  }, [collapseSidebar]);
 
   const handleStartDemo = async () => {
     setIsLoading(true);
@@ -129,7 +136,7 @@ const DemoLanding = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="demo-badge">
-              🚀 Interactive Demo - No Signup Required
+              🚀 Interactive Demo
             </div>
 
             <h1 className="demo-hero-title">
@@ -144,38 +151,6 @@ const DemoLanding = () => {
               Try the full demo with pre-loaded data. See how AI personas, chat-to-diary conversion,
               Mandalart goal-setting, and intelligent insights work together to transform your personal growth journey.
             </p>
-
-            <div className="demo-hero-actions">
-              <button
-                className="demo-cta-button demo-cta-primary"
-                onClick={handleStartDemo}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="demo-spinner"></span>
-                    Logging in...
-                  </>
-                ) : (
-                  <>
-                    🎬 Start Interactive Demo
-                  </>
-                )}
-              </button>
-
-              <button
-                className="demo-cta-button demo-cta-secondary"
-                onClick={() => navigate("/signup")}
-              >
-                Create Free Account
-              </button>
-            </div>
-
-            {error && (
-              <div className="demo-error-message">
-                {error}
-              </div>
-            )}
           </motion.div>
         </div>
 
