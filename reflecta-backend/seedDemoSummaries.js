@@ -222,55 +222,114 @@ Keep the summary concise (3-4 paragraphs), supportive, and insightful.`
       console.log(`   Found ${childJournals.length} journal entries across sub-goals and tasks`);
 
       if (childJournals.length > 0) {
-        // Group journals by child goal
+        // Group journals by parent sub-goal
+        // Journal entries are tagged with task IDs (e.g., "goal-1-3"),
+        // but we want to group them by their parent sub-goal (e.g., "goal-1")
         const journalsByGoal = {};
         childGoalIds.forEach(id => {
           const childGoal = targetGoal.subGoals.find(sg => sg && sg.id === id);
           if (childGoal) {
+            // Find all task IDs under this sub-goal
+            const taskIds = childGoal.subGoals
+              ? childGoal.subGoals.filter(ssg => ssg && ssg.id).map(ssg => ssg.id)
+              : [];
+
+            // Get all journal entries for this sub-goal's tasks
+            const entries = childJournals.filter(j => taskIds.includes(j.relatedGoalId));
+
             journalsByGoal[id] = {
               goalText: childGoal.text,
-              entries: childJournals.filter(j => j.relatedGoalId === id)
+              entries: entries
             };
           }
         });
 
-        // Create summary for each child goal
-        const childSummaries = Object.entries(journalsByGoal)
-          .filter(([_, data]) => data.entries.length > 0)
-          .map(([id, data]) => {
-            const entries = data.entries;
-            const moodDist = entries.reduce((acc, j) => {
-              acc[j.mood] = (acc[j.mood] || 0) + 1;
-              return acc;
-            }, {});
+        // Create summary for each child goal with INDIVIDUAL AI summaries
+        console.log('   Generating individual AI summaries for each sub-goal...');
+        const childSummariesWithAI = [];
 
-            const latestEntry = entries[0];
-            const oldestEntry = entries[entries.length - 1];
+        for (const [id, data] of Object.entries(journalsByGoal)) {
+          if (data.entries.length === 0) continue;
 
-            return {
-              goalId: id,
-              goalText: data.goalText,
-              entryCount: entries.length,
-              dateRange: {
-                start: oldestEntry.date,
-                end: latestEntry.date,
+          const entries = data.entries;
+          const moodDist = entries.reduce((acc, j) => {
+            acc[j.mood] = (acc[j.mood] || 0) + 1;
+            return acc;
+          }, {});
+
+          const latestEntry = entries[0];
+          const oldestEntry = entries[entries.length - 1];
+
+          // Generate individual AI summary for this sub-goal
+          let individualSummary = null;
+          try {
+            console.log(`   Processing sub-goal: "${data.goalText}" (${entries.length} entries)`);
+
+            const journalContents = entries.slice(0, 10).map((j, idx) => {
+              return `Entry ${idx + 1} (${j.date.toISOString().split('T')[0]}, Mood: ${j.mood}):\n${j.content.substring(0, 300)}`;
+            }).join('\n\n');
+
+            const individualResponse = await axios.post(
+              "https://api.openai.com/v1/chat/completions",
+              {
+                model: "gpt-3.5-turbo",
+                messages: [
+                  {
+                    role: "system",
+                    content: `You are analyzing progress for a specific sub-goal "${data.goalText}" under the main goal "${mainGoalText}". Provide a focused summary covering:
+1. Key progress and achievements
+2. Emotional patterns and challenges
+3. Next steps or areas for improvement
+
+Keep it concise (2-3 sentences), supportive, and specific to this sub-goal.`
+                  },
+                  {
+                    role: "user",
+                    content: `Analyze ${entries.length} journal entries for sub-goal "${data.goalText}":\n\n${journalContents}`
+                  }
+                ],
+                max_tokens: 200,
+                temperature: 0.7,
               },
-              moodDistribution: moodDist,
-              latestMood: latestEntry.mood,
-            };
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                },
+              }
+            );
+
+            individualSummary = individualResponse.data.choices[0].message.content;
+            console.log(`   ✓ AI summary generated for "${data.goalText}"`);
+          } catch (aiError) {
+            console.error(`   ❌ Failed to generate AI summary for sub-goal ${id}:`, aiError.message);
+            individualSummary = `You have ${entries.length} journal entries for "${data.goalText}". Keep tracking your progress!`;
+          }
+
+          childSummariesWithAI.push({
+            goalId: id,
+            goalText: data.goalText,
+            summary: individualSummary, // NEW: Individual AI summary
+            entryCount: entries.length,
+            dateRange: {
+              start: oldestEntry.date,
+              end: latestEntry.date,
+            },
+            moodDistribution: moodDist,
+            latestMood: latestEntry.mood,
           });
+        }
 
-        // Prepare content for AI
-        const summaryByGoal = childSummaries.map(cs => {
-          const goalsForAI = journalsByGoal[cs.goalId].entries.slice(0, 3); // Top 3 for each
-          const contentSample = goalsForAI.map(j =>
-            `[${j.date.toISOString().split('T')[0]}] ${j.content.substring(0, 150)}`
-          ).join(' ... ');
-          return `\n${cs.goalText} (${cs.entryCount} entries): ${contentSample}`;
-        }).join('\n');
+        const childSummaries = childSummariesWithAI;
 
-        // Call OpenAI for aggregated summary
+        // Generate overall aggregated summary for the parent goal
         try {
+          console.log('   Generating overall aggregated summary...');
+
+          const summaryByGoal = childSummaries.map(cs => {
+            return `\n${cs.goalText} (${cs.entryCount} entries): ${cs.summary}`;
+          }).join('\n');
+
           const openaiResponse = await axios.post(
             "https://api.openai.com/v1/chat/completions",
             {
@@ -315,12 +374,13 @@ Keep it concise (3-4 paragraphs), motivational, and actionable.`
             metadata: {
               goalText: mainGoalText,
               childGoalsCount: childGoalIds.length,
-              childGoalsSummaries: childSummaries,
+              childGoalsSummaries: childSummaries, // Now includes individual summaries
             },
             // NO expiresAt field - permanent for demo user
           });
 
-          console.log('   ✓ Sub-goals summary generated and saved (permanent)\n');
+          console.log('   ✓ Sub-goals summary generated and saved (permanent)');
+          console.log(`   ✓ Generated ${childSummaries.length} individual sub-goal summaries + 1 overall summary\n`);
         } catch (error) {
           console.error('   ❌ OpenAI API error:', error.response?.data || error.message);
           console.log('   Skipping sub-goals summary...\n');
@@ -332,7 +392,7 @@ Keep it concise (3-4 paragraphs), motivational, and actionable.`
       console.log('   ⚠️  No sub-goals found, skipping...\n');
     }
 
-    // 3. Generate Word Cloud (optional, but good to have)
+    // 3. Generate Word Cloud Cache (for both "all" and "recent" time ranges)
     console.log('3. Generating Word Cloud Cache...');
 
     const allJournalsForWordCloud = await JournalEntry.find({
@@ -341,48 +401,97 @@ Keep it concise (3-4 paragraphs), motivational, and actionable.`
     });
 
     if (allJournalsForWordCloud.length > 0) {
-      // Extract words
+      // Enhanced stop words (matching server.js improvements)
       const stopWords = new Set([
+        // Basic stop words
         "that", "this", "with", "from", "have", "been", "were", "your",
         "will", "would", "could", "should", "about", "there", "their",
         "which", "when", "where", "what", "more", "some", "into", "just",
-        "only", "very", "much", "than", "the", "a", "an", "and", "or", "but",
-        "in", "on", "at", "to", "for", "of", "by", "as", "is", "was", "are",
-        "be", "do", "does", "did", "i", "you", "he", "she", "it", "we", "they",
+        "only", "very", "much", "than", "then", "also", "well", "back",
+        // Time-related words (often not meaningful in diary context)
+        "today", "yesterday", "tomorrow", "week", "month", "year", "time",
+        "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
+        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+        // Common diary/journal words (too generic)
+        "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
+        "make", "made", "making", "want", "wanted", "need", "needed",
+        "going", "went", "come", "came", "know", "knew", "thing", "things",
+        "really", "quite", "pretty", "still", "always", "never", "often",
+        // Pronouns and common verbs
+        "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
+        "of", "by", "as", "is", "was", "are", "be", "do", "does", "did",
+        "i", "you", "he", "she", "it", "we", "they", "them", "their", "theirs",
+        "being", "having", "doing", "getting", "giving", "taking", "looking",
+        "trying", "working",
       ]);
 
-      const wordFreq = {};
-      allJournalsForWordCloud.forEach(entry => {
-        const words = entry.content.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
-        words.forEach(word => {
-          if (!stopWords.has(word)) {
-            wordFreq[word] = (wordFreq[word] || 0) + 1;
-          }
+      // Helper function to generate word cloud data
+      const generateWordCloud = (journals) => {
+        const wordFreq = {};
+        journals.forEach(entry => {
+          const words = entry.content.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+          words.forEach(word => {
+            if (!stopWords.has(word)) {
+              wordFreq[word] = (wordFreq[word] || 0) + 1;
+            }
+          });
         });
-      });
 
-      const currentWords = Object.entries(wordFreq)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 50)
-        .map(([text, value]) => ({ text, value }));
+        return Object.entries(wordFreq)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 50)
+          .map(([text, value]) => ({ text, value }));
+      };
 
-      // Save word cloud cache WITHOUT expiresAt
+      // Generate "all" time range word cloud
+      const allTimeWords = generateWordCloud(allJournalsForWordCloud);
+
       await GoalSummary.create({
         userId: demoUser._id,
         goalId: mainGoalDocId,
         summaryType: "wordcloud",
-        summary: `Word cloud for all timeRange`,
+        summary: `Word cloud for all time`,
         metadata: {
           timeRange: "all",
           wordCloudData: {
-            current: currentWords,
+            current: allTimeWords,
             past: [],
           },
         },
         // NO expiresAt field - permanent for demo user
       });
 
-      console.log('   ✓ Word cloud cache generated and saved (permanent)\n');
+      console.log(`   ✓ Word cloud "all" time range: ${allTimeWords.length} words`);
+
+      // Generate "recent" (last 3 months) time range word cloud
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+      const recentJournals = allJournalsForWordCloud.filter(
+        j => j.date >= threeMonthsAgo
+      );
+
+      console.log(`   Found ${recentJournals.length} journal entries in last 3 months`);
+
+      const recentWords = generateWordCloud(recentJournals);
+
+      await GoalSummary.create({
+        userId: demoUser._id,
+        goalId: mainGoalDocId,
+        summaryType: "wordcloud",
+        summary: `Word cloud for last 3 months`,
+        metadata: {
+          timeRange: "recent",
+          wordCloudData: {
+            current: recentWords,
+            past: [],
+          },
+        },
+        // NO expiresAt field - permanent for demo user
+      });
+
+      console.log(`   ✓ Word cloud "recent" time range: ${recentWords.length} words`);
+      console.log('   ✓ Both word cloud caches generated and saved (permanent)\n');
     } else {
       console.log('   ⚠️  No journal entries for word cloud, skipping...\n');
     }

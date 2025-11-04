@@ -1330,10 +1330,23 @@ app.get(
         ? new mongoose.Types.ObjectId(req.user.userId)
         : req.user.userId;
 
-      // Get progress entries with mood and notes
+      // If goalId is MongoDB ObjectId, find the Goal and get Mandalart ID
+      let mandalartId = goalId;
+      if (mongoose.Types.ObjectId.isValid(goalId)) {
+        const goal = await Goal.findOne({
+          _id: goalId,
+          userId: userId
+        });
+
+        if (goal && goal.mandalartData && goal.mandalartData.id) {
+          mandalartId = goal.mandalartData.id;
+        }
+      }
+
+      // Get progress entries with mood and notes using Mandalart ID
       const progressEntries = await GoalProgress.find({
         userId,
-        goalId,
+        goalId: mandalartId,
       })
         .sort({ date: 1 }) // Ascending order for journey timeline
         .lean();
@@ -1636,12 +1649,15 @@ app.get("/api/goals/:goalId/journals/summary", authenticateToken, async (req, re
     const { goalId } = req.params;
     const userId = req.user.userId;
 
-    // Check for cached summary (valid for 7 days)
+    // Check for cached summary (valid for 7 days, or permanent for demo user)
     const cachedSummary = await GoalSummary.findOne({
       userId,
       goalId,
       summaryType: "journal",
-      expiresAt: { $gt: new Date() }
+      $or: [
+        { expiresAt: { $exists: false } }, // Permanent (demo user)
+        { expiresAt: { $gt: new Date() } } // Not yet expired
+      ]
     }).sort({ createdAt: -1 });
 
     if (cachedSummary) {
@@ -1858,12 +1874,15 @@ app.get("/api/goals/:goalId/children/summary", authenticateToken, async (req, re
     const { goalId } = req.params;
     const userId = req.user.userId;
 
-    // Check for cached summary (valid for 7 days)
+    // Check for cached summary (valid for 7 days, or permanent for demo user)
     const cachedSummary = await GoalSummary.findOne({
       userId,
       goalId,
       summaryType: "children",
-      expiresAt: { $gt: new Date() }
+      $or: [
+        { expiresAt: { $exists: false } }, // Permanent (demo user)
+        { expiresAt: { $gt: new Date() } } // Not yet expired
+      ]
     }).sort({ createdAt: -1 });
 
     if (cachedSummary) {
@@ -1955,31 +1974,79 @@ app.get("/api/goals/:goalId/children/summary", authenticateToken, async (req, re
       }
     });
 
-    // Create summary for each child goal
-    const childSummaries = Object.entries(journalsByGoal)
-      .filter(([_, data]) => data.entries.length > 0)
-      .map(([id, data]) => {
-        const entries = data.entries;
-        const moodDist = entries.reduce((acc, j) => {
-          acc[j.mood] = (acc[j.mood] || 0) + 1;
-          return acc;
-        }, {});
+    // Create summary for each child goal with individual AI summaries
+    const childSummariesWithAI = [];
 
-        const latestEntry = entries[0];
-        const oldestEntry = entries[entries.length - 1];
+    for (const [id, data] of Object.entries(journalsByGoal)) {
+      if (data.entries.length === 0) continue;
 
-        return {
-          goalId: id,
-          goalText: data.goalText,
-          entryCount: entries.length,
-          dateRange: {
-            start: oldestEntry.date,
-            end: latestEntry.date,
+      const entries = data.entries;
+      const moodDist = entries.reduce((acc, j) => {
+        acc[j.mood] = (acc[j.mood] || 0) + 1;
+        return acc;
+      }, {});
+
+      const latestEntry = entries[0];
+      const oldestEntry = entries[entries.length - 1];
+
+      // Generate individual AI summary for this sub-goal
+      let individualSummary = null;
+      try {
+        const journalContents = entries.slice(0, 10).map((j, idx) => {
+          return `Entry ${idx + 1} (${j.date.toISOString().split('T')[0]}, Mood: ${j.mood}):\n${j.content.substring(0, 300)}`;
+        }).join('\n\n');
+
+        const individualResponse = await axios.post(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            model: "gpt-3.5-turbo",
+            messages: [
+              {
+                role: "system",
+                content: `You are analyzing progress for a specific sub-goal "${data.goalText}" under the main goal "${targetGoal.text}". Provide a focused summary covering:
+1. Key progress and achievements
+2. Emotional patterns and challenges
+3. Next steps or areas for improvement
+
+Keep it concise (2-3 sentences), supportive, and specific to this sub-goal.`
+              },
+              {
+                role: "user",
+                content: `Analyze ${entries.length} journal entries for sub-goal "${data.goalText}":\n\n${journalContents}`
+              }
+            ],
+            max_tokens: 200,
+            temperature: 0.7,
           },
-          moodDistribution: moodDist,
-          latestMood: latestEntry.mood,
-        };
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            },
+          }
+        );
+
+        individualSummary = individualResponse.data.choices[0].message.content;
+      } catch (aiError) {
+        console.error(`Failed to generate AI summary for sub-goal ${id}:`, aiError.message);
+        individualSummary = `You have ${entries.length} journal entries for "${data.goalText}". Keep tracking your progress!`;
+      }
+
+      childSummariesWithAI.push({
+        goalId: id,
+        goalText: data.goalText,
+        summary: individualSummary, // NEW: Individual AI summary
+        entryCount: entries.length,
+        dateRange: {
+          start: oldestEntry.date,
+          end: latestEntry.date,
+        },
+        moodDistribution: moodDist,
+        latestMood: latestEntry.mood,
       });
+    }
+
+    const childSummaries = childSummariesWithAI;
 
     // Prepare all content for overall AI summary
     const summaryByGoal = childSummaries.map(cs => {
@@ -3141,10 +3208,23 @@ app.get(
         if (!entries || entries.length === 0) return [];
 
         const stopWords = new Set([
+          // Basic stop words
           "that", "this", "with", "from", "have", "been", "were", "your",
           "will", "would", "could", "should", "about", "there", "their",
           "which", "when", "where", "what", "more", "some", "into", "just",
-          "only", "very", "much", "than",
+          "only", "very", "much", "than", "then", "also", "well", "back",
+          // Time-related words (often not meaningful in diary context)
+          "today", "yesterday", "tomorrow", "week", "month", "year", "time",
+          "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
+          "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+          // Common diary/journal words (too generic)
+          "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
+          "make", "made", "making", "want", "wanted", "need", "needed",
+          "going", "went", "come", "came", "know", "knew", "thing", "things",
+          "really", "quite", "pretty", "still", "always", "never", "often",
+          // Pronouns and common verbs
+          "they", "them", "their", "theirs", "being", "having", "doing",
+          "getting", "giving", "taking", "looking", "trying", "working",
         ]);
 
         const allText = entries
