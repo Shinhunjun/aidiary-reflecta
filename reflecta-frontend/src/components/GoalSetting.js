@@ -696,7 +696,8 @@ const GoalSetting = () => {
   };
   return (
     <div className="mandalart-container">
-      <div className="mandalart-page-header">
+      {/* Header hidden for cleaner view */}
+      {/* <div className="mandalart-page-header">
         <div className="mandalart-breadcrumbs">
           <Link to="/">Home</Link>
           <span className="separator">/</span>
@@ -735,7 +736,7 @@ const GoalSetting = () => {
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {mainMandalart.text === "" ? (
         <div className="initial-goal-setup">
@@ -1059,7 +1060,8 @@ const GoalSetting = () => {
               </div>
             </div>
 
-            <aside className="mandalart-sidebar">
+            {/* Sidebar hidden for cleaner view */}
+            {/* <aside className="mandalart-sidebar">
               <div className="mandalart-sidebar-card">
                 <h4>Progress Snapshot</h4>
                 <ul className="mandalart-stat-list">
@@ -1087,7 +1089,7 @@ const GoalSetting = () => {
                 <h4>Next Suggested Step</h4>
                 <p>
                   {firstGoalNeedingDetail
-                    ? `Add supporting actions for “${firstGoalNeedingDetail.text}” to keep momentum.`
+                    ? `Add supporting actions for "${firstGoalNeedingDetail.text}" to keep momentum.`
                     : "All primary goals are supported. Continue refining or revisit your journal insights."}
                 </p>
                 <ul className="mandalart-tips-list">
@@ -1099,7 +1101,7 @@ const GoalSetting = () => {
                   Open Journal Workspace
                 </Link>
               </div>
-            </aside>
+            </aside> */}
           </div>
         </>
       )}
