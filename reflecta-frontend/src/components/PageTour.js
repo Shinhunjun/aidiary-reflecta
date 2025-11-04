@@ -193,7 +193,7 @@ const PageTour = ({
           className="tour-highlight"
           style={{
             top: `${highlightedElement.getBoundingClientRect().top + window.scrollY}px`,
-            left: `${highlightedElement.getBoundingClientRect().left}px`,
+            left: `${highlightedElement.getBoundingClientRect().left + window.scrollX}px`,
             width: `${highlightedElement.offsetWidth}px`,
             height: `${highlightedElement.offsetHeight}px`,
           }}

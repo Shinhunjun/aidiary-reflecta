@@ -76,7 +76,7 @@ export const TourProvider = ({ children }) => {
     // Navigate to next page
     const pageRoutes = {
       'goal-setting': '/goal-setting',
-      'chat': '/chat',
+      'chat': '/journal',  // Chat component is at /journal route
       'dashboard': '/dashboard',
     };
 
