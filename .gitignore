@@ -22,14 +22,12 @@ share/
 reflecta-frontend/node_modules/
 reflecta-frontend/build/
 reflecta-frontend/.env
-reflecta-frontend/.env.local
+reflecta-frontend/.env.*
 
 # Backend
 reflecta-backend/node_modules/
 reflecta-backend/.env
-reflecta-backend/.env.local
-reflecta-backend/.env.backup
-reflecta-backend/.env.yaml
+reflecta-backend/.env.*
 
 # MCP Configuration
 .env.mcp

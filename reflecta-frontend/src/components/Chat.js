@@ -85,6 +85,27 @@ const Chat = () => {
     return () => clearTimeout(timeoutId);
   }, [messages, user?.id, isLoadingChat]);
 
+  // Load default persona on mount
+  useEffect(() => {
+    const loadDefaultPersona = async () => {
+      if (!user?.id) return;
+
+      try {
+        const personas = await apiService.getPersonas();
+        // Select first default persona (Empathetic Listener)
+        const defaultPersona = personas.find(p => p.isDefault) || personas[0];
+        if (defaultPersona) {
+          setSelectedPersonaId(defaultPersona._id);
+          setCurrentPersona(defaultPersona);
+        }
+      } catch (error) {
+        console.error("Error loading default persona:", error);
+      }
+    };
+
+    loadDefaultPersona();
+  }, [user?.id]);
+
   // 대화 선택 관련 함수들
   const toggleMessageSelection = (messageId) => {
     setSelectedMessages((prev) =>
@@ -318,9 +339,19 @@ const Chat = () => {
     }
   };
 
-  const handlePersonaSelect = (personaId) => {
-    setSelectedPersonaId(personaId);
-    setShowPersonaSelector(false);
+  const handlePersonaSelect = async (personaId) => {
+    try {
+      setSelectedPersonaId(personaId);
+      // Fetch full persona object to display icon and name
+      const persona = await apiService.getPersona(personaId);
+      setCurrentPersona(persona);
+      setShowPersonaSelector(false);
+    } catch (error) {
+      console.error("Error loading persona:", error);
+      // Still update ID even if fetch fails
+      setSelectedPersonaId(personaId);
+      setShowPersonaSelector(false);
+    }
   };
 
   const formatTime = (timestamp) => {
