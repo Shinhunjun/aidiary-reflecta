@@ -87,78 +87,39 @@ const GoalSummaryModal = ({
           </div>
 
           <div className="modal-body">
-            {/* Children Summary Section */}
+            {/* Sub-Goal AI Summary Section */}
             {childrenSummary && (
               <div className="children-summary-section">
-                <h3 className="summary-title">Sub-Goals Progress Overview</h3>
+                <h3 className="summary-title">🎯 AI Progress Summary</h3>
 
                 {loadingChildrenSummary ? (
                   <div className="loading-spinner">Loading summary...</div>
                 ) : (
                   <>
-                    {/* Overall Summary */}
-                    {childrenSummary.summary && (
-                      <div className="overall-summary">
-                        <h4>Overall Progress Analysis</h4>
-                        <p>{childrenSummary.summary}</p>
-                        <div className="summary-stats">
-                          <span>
-                            📝 {childrenSummary.totalEntries} total journal
-                            entries
-                          </span>
-                          <span>
-                            🎯 {childrenSummary.childGoalsSummaries?.length}{" "}
-                            active sub-goals
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Individual Child Goals - Show only selected sub-goal */}
+                    {/* Selected Sub-Goal Summary - Show in same style as Overall Progress Analysis */}
                     {filteredChildrenSummaries &&
                       filteredChildrenSummaries.length > 0 && (
-                        <div className="child-goals-grid">
-                          {filteredChildrenSummaries.map(
-                            (child, index) => (
-                              <div
-                                key={child.goalId || index}
-                                className="child-goal-card"
-                                style={{
-                                  borderLeft: `4px solid ${getMoodColor(
-                                    child.dominantMood || child.latestMood
-                                  )}`,
-                                }}
-                              >
-                                <div className="child-goal-header">
-                                  <h4>{child.goalText}</h4>
-                                  <span className="entry-count">
-                                    {child.entryCount} entries
+                        <>
+                          {filteredChildrenSummaries.map((child, index) => (
+                            <div key={child.goalId || index} className="overall-summary">
+                              <h4>{child.goalText}</h4>
+                              <p>{child.summary}</p>
+                              <div className="summary-stats">
+                                <span>📝 {child.entryCount} journal entries</span>
+                                {child.dateRange && (
+                                  <span>
+                                    📅 {new Date(child.dateRange.start).toLocaleDateString()} - {new Date(child.dateRange.end).toLocaleDateString()}
                                   </span>
-                                </div>
-
-                                <p className="child-goal-summary">
-                                  {child.summary}
-                                </p>
-
+                                )}
                                 {(child.dominantMood || child.latestMood) && (
-                                  <div className="mood-indicator">
-                                    <span
-                                      className="mood-dot"
-                                      style={{
-                                        backgroundColor: getMoodColor(
-                                          child.dominantMood || child.latestMood
-                                        ),
-                                      }}
-                                    />
-                                    <span className="mood-label">
-                                      Latest mood: {child.dominantMood || child.latestMood}
-                                    </span>
-                                  </div>
+                                  <span>
+                                    😊 Latest mood: {child.dominantMood || child.latestMood}
+                                  </span>
                                 )}
                               </div>
-                            )
-                          )}
-                        </div>
+                            </div>
+                          ))}
+                        </>
                       )}
 
                     {(!filteredChildrenSummaries ||
