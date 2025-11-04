@@ -602,14 +602,14 @@
 }
 
 /* Hover effect - enlarge image in place (1.5x scale) */
-.demo-screenshot-wrapper:hover .demo-screenshot-placeholder {
+.demo-screenshot-placeholder:hover {
   transform: scale(1.5);
   z-index: 100;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
 }
 
-/* Brighten caption on hover */
-.demo-screenshot-wrapper:hover .demo-screenshot-caption {
+/* Brighten caption on image hover */
+.demo-screenshot-placeholder:hover + .demo-screenshot-caption {
   color: #c4b5fd;
   transform: scale(1.05);
 }
