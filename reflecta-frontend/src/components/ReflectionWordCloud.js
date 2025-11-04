@@ -69,35 +69,40 @@ const ReflectionWordCloud = ({ goalId }) => {
       );
     }
 
-    const maxCount = Math.max(...words.map((w) => w.count));
+    const maxCount = Math.max(...words.map((w) => w.value || w.count || 0));
 
     return (
       <div className="word-cloud-section">
         {title && <h3 className="cloud-title">{title}</h3>}
         <div className="word-cloud">
-          {words.map((item, index) => (
-            <span
-              key={index}
-              className="cloud-word"
-              style={{
-                fontSize: `${getFontSize(item.count, maxCount)}px`,
-                color: getColor(index, words.length),
-                margin: '8px 12px',
-                display: 'inline-block',
-                transition: 'transform 0.3s ease',
-                cursor: 'pointer',
-              }}
-              title={`Mentioned ${item.count} times`}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'scale(1.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'scale(1)';
-              }}
-            >
-              {item.word}
-            </span>
-          ))}
+          {words.map((item, index) => {
+            const count = item.value || item.count || 0;
+            const word = item.text || item.word || '';
+
+            return (
+              <span
+                key={index}
+                className="cloud-word"
+                style={{
+                  fontSize: `${getFontSize(count, maxCount)}px`,
+                  color: getColor(index, words.length),
+                  margin: '8px 12px',
+                  display: 'inline-block',
+                  transition: 'transform 0.3s ease',
+                  cursor: 'pointer',
+                }}
+                title={`Mentioned ${count} times`}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                {word}
+              </span>
+            );
+          })}
         </div>
       </div>
     );
