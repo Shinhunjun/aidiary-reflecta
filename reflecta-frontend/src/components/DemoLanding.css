@@ -587,6 +587,7 @@
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   transition: all 0.4s ease;
+  background: #0f172a; /* Match page background for seamless look */
 }
 
 .demo-screenshot-placeholder:hover {
@@ -597,7 +598,7 @@
 .demo-screenshot-placeholder img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Show full image without cropping */
   display: block;
 }
 
