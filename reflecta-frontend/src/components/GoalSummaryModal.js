@@ -129,100 +129,22 @@ const GoalSummaryModal = ({
                         progress insights!
                       </div>
                     )}
-                  </>
-                )}
-              </div>
-            )}
 
-            {/* Journal Summary Section */}
-            {journalSummary && (
-              <div className="journal-summary-section">
-                <h3 className="summary-title">Journal Insights</h3>
-
-                {loadingJournalSummary ? (
-                  <div className="loading-spinner">Loading insights...</div>
-                ) : (
-                  <>
-                    {journalSummary.summary && (
-                      <div className="insights-summary">
-                        <p>{journalSummary.summary}</p>
-                        <div className="insights-stats">
-                          <span>📝 {journalSummary.entryCount} entries</span>
-                          {journalSummary.dateRange && (
-                            <span>
-                              📅 {journalSummary.dateRange.start} to{" "}
-                              {journalSummary.dateRange.end}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Mood Distribution */}
-                    {journalSummary.moodDistribution &&
-                      Object.keys(journalSummary.moodDistribution).length >
-                        0 && (
-                        <div className="mood-distribution">
-                          <h4>Mood Distribution</h4>
-                          <div className="mood-bars">
-                            {Object.entries(journalSummary.moodDistribution)
-                              .sort(([, a], [, b]) => b - a)
-                              .map(([mood, count]) => (
-                                <div key={mood} className="mood-bar-container">
-                                  <span className="mood-name">{mood}</span>
-                                  <div className="mood-bar-wrapper">
-                                    <div
-                                      className="mood-bar"
-                                      style={{
-                                        width: `${
-                                          (count / journalSummary.entryCount) *
-                                          100
-                                        }%`,
-                                        backgroundColor: getMoodColor(mood),
-                                      }}
-                                    />
-                                    <span className="mood-count">{count}</span>
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      )}
-
-                    {/* Word Cloud */}
-                    {journalSummary.wordCloud &&
-                      journalSummary.wordCloud.length > 0 && (
+                    {/* Word Cloud for Selected Sub-Goal */}
+                    {filteredChildrenSummaries &&
+                      filteredChildrenSummaries.length > 0 &&
+                      filteredChildrenSummaries[0].wordCloud &&
+                      filteredChildrenSummaries[0].wordCloud.length > 0 && (
                         <div className="word-cloud-section">
                           <h4>Word Cloud - Most Frequent Terms</h4>
-                          <WordCloud words={journalSummary.wordCloud} />
+                          <WordCloud words={filteredChildrenSummaries[0].wordCloud} />
                         </div>
                       )}
-
-                    {/* Key Themes */}
-                    {journalSummary.keyThemes &&
-                      journalSummary.keyThemes.length > 0 && (
-                        <div className="key-themes">
-                          <h4>Key Themes</h4>
-                          <div className="themes-list">
-                            {journalSummary.keyThemes.map((theme, index) => (
-                              <span key={index} className="theme-tag">
-                                {theme}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                    {!journalSummary.summary && (
-                      <div className="no-data-message">
-                        No journal entries found for this goal yet. Start
-                        journaling to see insights!
-                      </div>
-                    )}
                   </>
                 )}
               </div>
             )}
+
 
             {/* Journal Entries List */}
             {journalEntries && journalEntries.length > 0 && (
@@ -269,7 +191,7 @@ const GoalSummaryModal = ({
               </div>
             )}
 
-            {!childrenSummary && !journalSummary && !journalEntries?.length && (
+            {!childrenSummary && !journalEntries?.length && (
               <div className="no-data-message">
                 No data available. Start journaling to see progress insights!
               </div>

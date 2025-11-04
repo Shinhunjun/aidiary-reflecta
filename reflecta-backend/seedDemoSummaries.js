@@ -260,6 +260,42 @@ Keep the summary concise (3-4 paragraphs), supportive, and insightful.`
           const latestEntry = entries[0];
           const oldestEntry = entries[entries.length - 1];
 
+          // Generate word cloud for this sub-goal
+          const stopWords = new Set([
+            // Basic stop words
+            "that", "this", "with", "from", "have", "been", "were", "your",
+            "will", "would", "could", "should", "about", "there", "their",
+            "which", "when", "where", "what", "more", "some", "into", "just",
+            "only", "very", "much", "than", "then", "also", "well", "back",
+            // Time-related words
+            "today", "yesterday", "tomorrow", "week", "month", "year", "time",
+            "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
+            "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+            // Common diary/journal words
+            "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
+            "make", "made", "making", "want", "wanted", "need", "needed",
+            "going", "went", "come", "came", "know", "knew", "thing", "things",
+            "really", "quite", "pretty", "still", "always", "never", "often",
+            // Pronouns and common verbs
+            "they", "them", "their", "theirs", "being", "having", "doing",
+            "getting", "giving", "taking", "looking", "trying", "working",
+          ]);
+
+          const wordFreq = {};
+          entries.forEach(j => {
+            const words = `${j.title || ''} ${j.content || ''}`.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+            words.forEach(word => {
+              if (!stopWords.has(word)) {
+                wordFreq[word] = (wordFreq[word] || 0) + 1;
+              }
+            });
+          });
+
+          const wordCloudData = Object.entries(wordFreq)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 50)
+            .map(([text, value]) => ({ text, value }));
+
           // Generate individual AI summary for this sub-goal
           let individualSummary = null;
           try {
@@ -317,6 +353,7 @@ Keep it concise (2-3 sentences), supportive, and specific to this sub-goal.`
             },
             moodDistribution: moodDist,
             latestMood: latestEntry.mood,
+            wordCloud: wordCloudData, // NEW: Sub-goal specific word cloud
           });
         }
 

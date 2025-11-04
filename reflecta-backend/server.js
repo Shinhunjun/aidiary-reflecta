@@ -1946,11 +1946,26 @@ app.get("/api/goals/:goalId/children/summary", authenticateToken, async (req, re
       });
     }
 
-    // Get all journals for child goals
+    // Collect all goal IDs including sub-sub-goals (tasks)
+    const allChildGoalIds = [];
+    targetGoal.subGoals.forEach(sg => {
+      if (sg && sg.id) {
+        allChildGoalIds.push(sg.id); // Add sub-goal ID
+        if (sg.subGoals) {
+          sg.subGoals.forEach(ssg => {
+            if (ssg && ssg.id) {
+              allChildGoalIds.push(ssg.id); // Add sub-sub-goal (task) ID
+            }
+          });
+        }
+      }
+    });
+
+    // Get all journals for child goals and their sub-goals (tasks)
     const journals = await JournalEntry.find({
       userId: userId,
-      relatedGoalId: { $in: childGoalIds },
-    }).sort({ date: -1 }).limit(50); // Max 50 entries for aggregation
+      relatedGoalId: { $in: allChildGoalIds },
+    }).sort({ date: -1 }).limit(100); // Increased limit for comprehensive summary
 
     if (journals.length === 0) {
       return res.json({
@@ -1962,14 +1977,24 @@ app.get("/api/goals/:goalId/children/summary", authenticateToken, async (req, re
       });
     }
 
-    // Group journals by child goal
+    // Group journals by parent sub-goal
+    // Journal entries are tagged with task IDs (e.g., "goal-1-3"),
+    // but we want to group them by their parent sub-goal (e.g., "goal-1")
     const journalsByGoal = {};
     childGoalIds.forEach(id => {
       const childGoal = targetGoal.subGoals.find(sg => sg && sg.id === id);
       if (childGoal) {
+        // Find all task IDs under this sub-goal
+        const taskIds = childGoal.subGoals
+          ? childGoal.subGoals.filter(ssg => ssg && ssg.id).map(ssg => ssg.id)
+          : [];
+
+        // Get all journal entries for this sub-goal's tasks
+        const entries = journals.filter(j => taskIds.includes(j.relatedGoalId));
+
         journalsByGoal[id] = {
           goalText: childGoal.text,
-          entries: journals.filter(j => j.relatedGoalId === id)
+          entries: entries
         };
       }
     });
@@ -1988,6 +2013,42 @@ app.get("/api/goals/:goalId/children/summary", authenticateToken, async (req, re
 
       const latestEntry = entries[0];
       const oldestEntry = entries[entries.length - 1];
+
+      // Generate word cloud for this sub-goal
+      const stopWords = new Set([
+        // Basic stop words
+        "that", "this", "with", "from", "have", "been", "were", "your",
+        "will", "would", "could", "should", "about", "there", "their",
+        "which", "when", "where", "what", "more", "some", "into", "just",
+        "only", "very", "much", "than", "then", "also", "well", "back",
+        // Time-related words
+        "today", "yesterday", "tomorrow", "week", "month", "year", "time",
+        "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
+        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+        // Common diary/journal words
+        "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
+        "make", "made", "making", "want", "wanted", "need", "needed",
+        "going", "went", "come", "came", "know", "knew", "thing", "things",
+        "really", "quite", "pretty", "still", "always", "never", "often",
+        // Pronouns and common verbs
+        "they", "them", "their", "theirs", "being", "having", "doing",
+        "getting", "giving", "taking", "looking", "trying", "working",
+      ]);
+
+      const wordFreq = {};
+      entries.forEach(j => {
+        const words = `${j.title || ''} ${j.content || ''}`.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+        words.forEach(word => {
+          if (!stopWords.has(word)) {
+            wordFreq[word] = (wordFreq[word] || 0) + 1;
+          }
+        });
+      });
+
+      const wordCloudData = Object.entries(wordFreq)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 50)
+        .map(([text, value]) => ({ text, value }));
 
       // Generate individual AI summary for this sub-goal
       let individualSummary = null;
@@ -2043,6 +2104,7 @@ Keep it concise (2-3 sentences), supportive, and specific to this sub-goal.`
         },
         moodDistribution: moodDist,
         latestMood: latestEntry.mood,
+        wordCloud: wordCloudData, // NEW: Sub-goal specific word cloud
       });
     }
 
