@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
 import GoalProgressModal from "./GoalProgressModal";
+import PageTour from "./PageTour";
+import HelpButton from "./HelpButton";
 import "./GoalSetting.css";
 
 // Helper to create an empty Mandalart grid
@@ -1592,6 +1594,76 @@ const GoalSetting = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Page Tour for Goal Setting */}
+      <PageTour
+        page="goal-setting"
+        navigateToNext="chat"
+        pageTotalSteps={9}
+        pageStartStep={0}
+        steps={[
+          {
+            icon: "👋",
+            title: "Welcome to Goal Setting!",
+            description: "This is where you'll create your goals using the Mandalart framework - a powerful technique that breaks down one main goal into 8 sub-goals, and each sub-goal into 8 actionable tasks (64 tasks total). Let's set up your roadmap to success!",
+            selector: null,
+          },
+          {
+            icon: "🎯",
+            title: "The Mandalart Grid",
+            description: "This 3x3 grid is your goal planning canvas. The center cell is for your main goal, and the 8 surrounding cells are for your sub-goals. Each sub-goal can be expanded to reveal another 3x3 grid of actionable tasks.",
+            selector: ".mandalart-grid",
+          },
+          {
+            icon: "⭐",
+            title: "Set Your Main Goal",
+            description: "The center cell holds your ultimate objective - what you want to achieve. Click on it to enter your main goal. Make it meaningful and specific! For this demo, our main goal is already set: 'Achieve Holistic Personal Growth'.",
+            selector: ".mandalart-cell.center",
+          },
+          {
+            icon: "🤖",
+            title: "AI Goal Assistant",
+            description: "Stuck on what sub-goals to create? Our AI can analyze your main goal and suggest 8 relevant sub-goals automatically. It's like having a personal goal-setting coach! Click this button to see AI suggestions.",
+            selector: ".mandalart-primary-btn",
+          },
+          {
+            icon: "📝",
+            title: "Sub-Goal Cells",
+            description: "These 8 surrounding cells are your sub-goals - the major categories that support your main goal. Examples: 'Career Excellence', 'Physical Health', 'Mental Wellness'. Each sub-goal breaks down into 8 specific action items.",
+            selector: ".mandalart-cell:not(.center):not(.empty)",
+            waitForElement: true,
+          },
+          {
+            icon: "🔍",
+            title: "Expand a Sub-Goal",
+            description: "Click any sub-goal cell to zoom in and see its 8 actionable tasks. This is where you define concrete steps. Try clicking 'Career Excellence' to see its breakdown into specific actions like 'Network with industry leaders' or 'Complete certification'.",
+            selector: ".mandalart-cell:not(.center):not(.empty)",
+          },
+          {
+            icon: "✅",
+            title: "64 Action Tasks",
+            description: "When you expand a sub-goal, you'll see another 3x3 grid. These are your action-level tasks - the specific things you'll do. 8 sub-goals × 8 tasks each = 64 actionable items! That's the power of Mandalart.",
+            selector: ".mandalart-grid",
+          },
+          {
+            icon: "💾",
+            title: "Save Your Goals",
+            description: "Once you've defined your goals and tasks, save them to your account. Your goals will be linked to your journal entries, so you can track progress over time and see AI-powered insights about your journey.",
+            selector: ".mandalart-solid-btn",
+          },
+          {
+            icon: "📔",
+            title: "Next: Start Journaling!",
+            description: "Now that your goals are set, it's time to start journaling about your progress! You'll chat with an AI that helps you reflect on your experiences, then convert those conversations into structured journal entries mapped to your goals.",
+            selector: null,
+          },
+        ]}
+      />
+
+      {/* Help Button for demo users */}
+      {user?.email === 'demo@reflecta.com' && (
+        <HelpButton page="goal-setting" />
       )}
     </div>
   );

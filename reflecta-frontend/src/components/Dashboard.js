@@ -395,42 +395,68 @@ const Dashboard = () => {
       {/* Page Tour for Demo Users */}
       <PageTour
         page="dashboard"
+        pageTotalSteps={10}
+        pageStartStep={21}
         steps={[
           {
             icon: "👋",
             title: "Welcome to Your Dashboard!",
-            description: "This is your personal growth command center. Here you can see your overall progress, journal statistics, and get AI-powered insights into your reflection journey.",
-            selector: null, // Center of screen
-          },
-          {
-            icon: "📈",
-            title: "Journal Statistics",
-            description: "Track how many journal entries you've created this week and in total. Consistent reflection is key to personal growth!",
-            selector: ".stats-container",
-          },
-          {
-            icon: "🎯",
-            title: "Your Main Goal",
-            description: "This shows your primary goal from the Mandalart framework. Click on it to see detailed summaries and related journal entries.",
-            selector: ".main-goal-card",
+            description: "You've completed the full journey! This is your personal growth command center where all your reflections, goals, and progress come together. See AI-powered insights, track emotional patterns, and discover what makes each goal unique.",
+            selector: null,
           },
           {
             icon: "📊",
-            title: "Progress Rings",
-            description: "Visual representation of your goal completion. The rings show progress for your main goal, sub-goals, and actionable tasks.",
-            selector: ".dashboard-section:has(.completion-rings-container)",
+            title: "Stats Overview",
+            description: "At a glance, see your primary goals, sub-goals, total journal entries, and this week's entries. These numbers tell the story of your commitment to personal growth and consistent reflection.",
+            selector: ".stats-overview",
+          },
+          {
+            icon: "🎯",
+            title: "Your Goals Overview",
+            description: "Your Mandalart goal structure displayed as clickable cards. Each card represents a sub-goal from your goal-setting page. Click any card to see detailed AI summaries and journal entries specific to that goal!",
+            selector: ".goals-grid",
+          },
+          {
+            icon: "💡",
+            title: "Click a Sub-Goal",
+            description: "Try clicking 'Career Excellence' or any other sub-goal card! A modal will open showing AI progress analysis, distinctive word clouds (words unique to that goal), and all related journal entries. This is where goal mapping pays off!",
+            selector: ".goal-card",
+          },
+          {
+            icon: "🤖",
+            title: "AI Progress Summary",
+            description: "See AI-generated insights about your overall progress! The system analyzes all your journal entries and creates summaries showing patterns, achievements, and areas for growth. These summaries are cached for 7 days to save API costs.",
+            selector: ".ai-summary-container",
           },
           {
             icon: "💭",
-            title: "Emotional Journey Map",
-            description: "See how your emotions evolve over time. This chart tracks your mood patterns and helps you understand your emotional trends.",
-            selector: ".dashboard-section:has(h2:contains('Emotional Journey'))",
+            title: "Emotional Journey",
+            description: "This chart visualizes your mood patterns over time. See how your emotional state fluctuates as you work toward your goals. Notice correlations between moods and progress - maybe you're happiest when achieving milestones!",
+            selector: ".dashboard-section",
           },
           {
             icon: "☁️",
-            title: "Word Cloud",
-            description: "The most frequent words from your journal entries appear here. Larger words indicate themes you focus on most.",
-            selector: ".dashboard-section:has(h2:contains('Words of Reflection'))",
+            title: "Words of Your Journey",
+            description: "Two word clouds compare your vocabulary: 'All Time' shows words from all entries, 'Last 3 Months' shows recent themes. Notice how your focus evolves! Toggle between views to see what's consistent vs. what's changing.",
+            selector: ".dashboard-section",
+          },
+          {
+            icon: "🔍",
+            title: "Distinctive Word Clouds",
+            description: "When you click a sub-goal card, its word cloud shows ONLY words unique to that goal - common words appearing across all goals are filtered out! This comparative filtering reveals what makes each goal distinct (e.g., 'network' for Career, 'workout' for Health).",
+            selector: null,
+          },
+          {
+            icon: "🔄",
+            title: "The Complete Loop",
+            description: "You've seen the full cycle: Set goals with Mandalart → Chat with AI → Convert to journal → Map to goals → View analytics! Every journal entry enriches your dashboard. Every goal you set gives context to your reflections. It's a continuous growth system.",
+            selector: null,
+          },
+          {
+            icon: "🎉",
+            title: "Tour Complete!",
+            description: "Congratulations! You now understand how Reflecta helps you grow through structured reflection. Try exploring on your own - journal about your progress, set new sub-goals, or review past insights. Your personal growth journey starts here!",
+            selector: null,
           },
         ]}
       />

@@ -4,6 +4,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { useJournal } from "../contexts/JournalContext";
 import apiService from "../services/api";
 import PersonaSelector from "./PersonaSelector";
+import PageTour from "./PageTour";
+import HelpButton from "./HelpButton";
 import "./Chat.css";
 
 const Chat = () => {
@@ -581,6 +583,97 @@ const Chat = () => {
         currentPersonaId={selectedPersonaId}
         onSelectPersona={handlePersonaSelect}
       />
+
+      {/* Page Tour for Chat */}
+      <PageTour
+        page="chat"
+        navigateToNext="dashboard"
+        pageTotalSteps={12}
+        pageStartStep={9}
+        steps={[
+          {
+            icon: "💬",
+            title: "Welcome to AI Chat & Journaling!",
+            description: "This is where reflection becomes natural conversation. Chat with our AI about your day, your thoughts, your progress - then convert those meaningful conversations into structured journal entries that map to your goals.",
+            selector: null,
+          },
+          {
+            icon: "🎭",
+            title: "Choose Your AI Companion",
+            description: "Click the persona button to select which AI companion you'd like to chat with. Each persona has a unique personality and communication style. Try 'Growth Mentor' for motivational support or 'Empathetic Listener' for emotional validation!",
+            selector: ".control-button.persona-button",
+          },
+          {
+            icon: "✍️",
+            title: "Type Your Message",
+            description: "Start a conversation! Share what's on your mind - progress updates, challenges you're facing, insights you've gained, or questions about your goals. The AI will engage thoughtfully and help you reflect deeper.",
+            selector: ".chat-input",
+          },
+          {
+            icon: "📨",
+            title: "Send Your Thoughts",
+            description: "Hit send to get an AI response! The AI will ask follow-up questions, provide perspective, and help you explore your thoughts. This back-and-forth dialogue becomes the foundation for rich journal entries.",
+            selector: ".send-button",
+          },
+          {
+            icon: "🤖",
+            title: "AI Responds Thoughtfully",
+            description: "Watch as the AI analyzes your message and responds. It considers your goals, past reflections, and current context to provide personalized guidance. The conversation flows naturally while staying focused on your growth.",
+            selector: ".chat-messages",
+          },
+          {
+            icon: "☑️",
+            title: "Select Messages",
+            description: "After chatting, click 'Select Messages' to choose which parts of your conversation you want to save as a journal entry. Not every message needs to be saved - pick the most meaningful insights and reflections.",
+            selector: ".control-button.select-button",
+          },
+          {
+            icon: "✅",
+            title: "Choose Your Messages",
+            description: "Checkboxes appear next to each message! Click to select the messages that capture important moments, breakthroughs, or reflections worth preserving. You can select as many or as few as you like.",
+            selector: ".message-checkbox",
+            waitForElement: true,
+          },
+          {
+            icon: "📔",
+            title: "Convert to Diary",
+            description: "Once you've selected messages, click 'Convert to Diary'. Our AI will transform your conversation into a well-structured journal entry with a clear narrative flow. It's like having a personal editor!",
+            selector: ".control-button.convert-button",
+          },
+          {
+            icon: "😊",
+            title: "Set Your Mood",
+            description: "In the diary modal, choose the mood that best reflects how you felt during this experience. Moods help track your emotional patterns over time and appear in your analytics visualizations.",
+            selector: ".diary-mood-selector",
+            waitForElement: true,
+          },
+          {
+            icon: "🎯",
+            title: "Automatic Goal Mapping",
+            description: "Here's the magic: our AI automatically analyzes your journal entry and links it to relevant goals from your Mandalart! It identifies which sub-goals and tasks your reflection relates to. This connection powers all your progress insights.",
+            selector: ".mapped-goals",
+            waitForElement: true,
+          },
+          {
+            icon: "💾",
+            title: "Save to Database",
+            description: "Click 'Save to Journal' and your entry is permanently stored with all its goal mappings! It becomes part of your reflection history and contributes to AI-generated summaries, word clouds, and progress analytics.",
+            selector: ".save-diary-btn",
+            waitForElement: true,
+          },
+          {
+            icon: "📊",
+            title: "Next: See Your Insights!",
+            description: "Now that you've journaled, head to the Dashboard to see the power of your reflections! View AI-generated summaries, distinctive word clouds for each sub-goal, emotional journey charts, and track how your journaling connects to goal progress.",
+            selector: null,
+          },
+        ]}
+      />
+
+      {/* Help Button for demo users */}
+      {user?.email === 'demo@reflecta.com' && (
+        <HelpButton page="chat" />
+      )}
     </div>
   );
 };

@@ -1,19 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTour } from '../contexts/TourContext';
 import './PageTour.css';
 
-const PageTour = ({ page, steps, onComplete }) => {
+const PageTour = ({
+  page,
+  steps,
+  onComplete,
+  navigateToNext = null, // Next page to navigate to
+  pageTotalSteps = null, // Total steps in this page
+  pageStartStep = 0 // Global step number where this page starts
+}) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [highlightedElement, setHighlightedElement] = useState(null);
+  const [waitingForAction, setWaitingForAction] = useState(false);
+
+  const {
+    tourActive,
+    globalStep,
+    totalSteps,
+    updateGlobalStep,
+    navigateToNextPage
+  } = useTour();
 
   useEffect(() => {
-    // Check if user is demo and hasn't seen this tour
+    // Check if user is demo and tour is active OR hasn't seen this tour
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     const tourKey = `tour_completed_${page}`;
     const tourCompleted = localStorage.getItem(tourKey);
+    const isTourActive = localStorage.getItem('demo_tour_active') === 'true';
 
-    if (currentUser.email === 'demo@reflecta.com' && !tourCompleted) {
+    if (currentUser.email === 'demo@reflecta.com' && (isTourActive || !tourCompleted)) {
       // Delay tour start slightly to ensure DOM is ready
       setTimeout(() => {
         setIsVisible(true);
@@ -26,25 +44,85 @@ const PageTour = ({ page, steps, onComplete }) => {
     if (stepIndex >= steps.length) return;
 
     const step = steps[stepIndex];
+
+    // Check if this step requires user action
+    if (step.requireAction && step.selector) {
+      setWaitingForAction(true);
+      setupActionListener(step);
+    } else {
+      setWaitingForAction(false);
+    }
+
     if (step.selector) {
-      const element = document.querySelector(step.selector);
-      if (element) {
-        setHighlightedElement(element);
-        // Scroll element into view smoothly
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      // Wait for element to appear if it's not immediately available
+      const checkElement = () => {
+        const element = document.querySelector(step.selector);
+        if (element) {
+          setHighlightedElement(element);
+          // Scroll element into view smoothly
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (step.waitForElement) {
+          // Retry after a short delay if element should appear
+          setTimeout(checkElement, 200);
+        }
+      };
+      checkElement();
     } else {
       setHighlightedElement(null);
     }
+
+    // Update global step counter
+    if (pageTotalSteps) {
+      updateGlobalStep(pageStartStep + stepIndex);
+    }
+  };
+
+  const setupActionListener = (step) => {
+    if (!step.selector || !step.requireAction) return;
+
+    const element = document.querySelector(step.selector);
+    if (!element) return;
+
+    // Add pulsing effect to indicate action required
+    element.classList.add('tour-action-required');
+
+    // Listen for click on the element
+    const handleAction = () => {
+      element.classList.remove('tour-action-required');
+      setWaitingForAction(false);
+
+      // Auto-advance after action
+      setTimeout(() => {
+        handleNext();
+      }, 500);
+    };
+
+    element.addEventListener('click', handleAction, { once: true });
+
+    // Store handler to cleanup later
+    element._tourHandler = handleAction;
   };
 
   const handleNext = () => {
+    // If waiting for user action, show message
+    if (waitingForAction) {
+      return; // Don't advance
+    }
+
     if (currentStep < steps.length - 1) {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
       highlightStep(nextStep);
     } else {
-      completeTour();
+      // Last step of this page
+      if (navigateToNext) {
+        // Navigate to next page in tour
+        const tourKey = `tour_completed_${page}`;
+        localStorage.setItem(tourKey, 'true');
+        navigateToNextPage(navigateToNext);
+      } else {
+        completeTour();
+      }
     }
   };
 
@@ -135,7 +213,11 @@ const PageTour = ({ page, steps, onComplete }) => {
         >
           <div className="tour-tooltip-header">
             <span className="tour-step-indicator">
-              {currentStep + 1} of {steps.length}
+              {tourActive && totalSteps > 0 ? (
+                <>Demo Tour: Step {globalStep + 1} of {totalSteps}</>
+              ) : (
+                <>{currentStep + 1} of {steps.length}</>
+              )}
             </span>
             <button className="tour-close-btn" onClick={handleSkip}>
               ✕
@@ -146,14 +228,37 @@ const PageTour = ({ page, steps, onComplete }) => {
             <div className="tour-icon">{currentStepData.icon}</div>
             <h3 className="tour-title">{currentStepData.title}</h3>
             <p className="tour-description">{currentStepData.description}</p>
+
+            {waitingForAction && (
+              <div className="tour-waiting-message">
+                👆 Please click the highlighted element to continue
+              </div>
+            )}
+
+            {currentStep === steps.length - 1 && navigateToNext && (
+              <div className="tour-next-page-preview">
+                <span className="tour-next-arrow">→</span>
+                Next: {navigateToNext === 'chat' ? 'Chat & Journaling' : navigateToNext === 'dashboard' ? 'Analytics Dashboard' : 'Next Page'}
+              </div>
+            )}
           </div>
 
           <div className="tour-tooltip-footer">
             <button className="tour-skip-btn" onClick={handleSkip}>
               Skip Tour
             </button>
-            <button className="tour-next-btn" onClick={handleNext}>
-              {currentStep < steps.length - 1 ? 'Next' : 'Got it!'}
+            <button
+              className="tour-next-btn"
+              onClick={handleNext}
+              disabled={waitingForAction}
+            >
+              {currentStep < steps.length - 1
+                ? waitingForAction
+                  ? 'Waiting...'
+                  : 'Next'
+                : navigateToNext
+                ? 'Continue →'
+                : 'Got it!'}
             </button>
           </div>
         </motion.div>

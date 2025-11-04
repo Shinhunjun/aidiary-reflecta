@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { JournalProvider } from "./contexts/JournalContext";
 import { SidebarProvider, useSidebar } from "./contexts/SidebarContext";
+import { TourProvider } from "./contexts/TourContext";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
@@ -229,6 +230,7 @@ function App() {
       <JournalProvider>
         <SidebarProvider>
           <Router>
+            <TourProvider>
             <div className="app-container">
               <Sidebar />
               <MainContent />
@@ -248,6 +250,7 @@ function App() {
                 }}
               />
             </div>
+            </TourProvider>
           </Router>
         </SidebarProvider>
       </JournalProvider>

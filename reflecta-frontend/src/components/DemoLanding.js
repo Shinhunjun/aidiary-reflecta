@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { useSidebar } from "../contexts/SidebarContext";
+import { useTour } from "../contexts/TourContext";
 import "./DemoLanding.css";
 
 const DemoLanding = () => {
   const navigate = useNavigate();
   const { loginAsDemo } = useAuth();
   const { collapseSidebar } = useSidebar();
+  const { startTour, updateTotalSteps } = useTour();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -41,6 +43,29 @@ const DemoLanding = () => {
     } catch (err) {
       setError("Something went wrong. Please try again later.");
       console.error("Demo login error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStartGuidedTour = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await loginAsDemo();
+      if (result.success) {
+        // Set total steps for the complete tour (Goal Setting: 9, Chat: 12, Dashboard: 10)
+        updateTotalSteps(31);
+
+        // Start the guided tour - this will navigate to goal-setting automatically
+        startTour();
+      } else {
+        setError(result.error || "Failed to start guided tour. Please try again.");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again later.");
+      console.error("Guided tour error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -449,6 +474,23 @@ const DemoLanding = () => {
                 ) : (
                   <>
                     🚀 Launch Demo Now
+                  </>
+                )}
+              </button>
+
+              <button
+                className="demo-cta-button demo-cta-secondary demo-cta-large"
+                onClick={handleStartGuidedTour}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="demo-spinner"></span>
+                    Loading Tour...
+                  </>
+                ) : (
+                  <>
+                    🎓 Start Guided Tour
                   </>
                 )}
               </button>
