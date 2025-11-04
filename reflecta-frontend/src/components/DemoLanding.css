@@ -577,6 +577,7 @@
   flex-direction: column;
   gap: 12px;
   position: relative;
+  transition: transform 0.4s ease;
 }
 
 .demo-screenshot-caption {
@@ -601,17 +602,25 @@
   cursor: pointer;
 }
 
-/* Hover effect - enlarge image in place (1.5x scale) */
-.demo-screenshot-placeholder:hover {
+/* Hover effect - enlarge entire grid when any screenshot is hovered */
+.demo-screenshots-grid:hover .demo-screenshot-wrapper {
   transform: scale(1.5);
   z-index: 100;
+}
+
+.demo-screenshots-grid:hover {
+  position: relative;
+  z-index: 100;
+}
+
+/* Enhanced shadow on hover */
+.demo-screenshots-grid:hover .demo-screenshot-placeholder {
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
 }
 
-/* Brighten caption on image hover */
-.demo-screenshot-placeholder:hover + .demo-screenshot-caption {
+/* Brighten captions on grid hover */
+.demo-screenshots-grid:hover .demo-screenshot-caption {
   color: #c4b5fd;
-  transform: scale(1.05);
 }
 
 .demo-screenshot-placeholder img {
