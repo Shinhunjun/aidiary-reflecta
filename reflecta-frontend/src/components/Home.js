@@ -90,7 +90,12 @@ const Home = () => {
               </motion.p>
               <motion.div className="hero-actions" variants={itemVariants}>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link to="/signup" className="cta-button">
+                  <Link to="/demo" className="cta-button">
+                    🎬 Try Demo
+                  </Link>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link to="/signup" className="secondary-button">
                     Get Started
                   </Link>
                 </motion.div>

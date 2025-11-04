@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
 import GoalSummaryModal from "./GoalSummaryModal";
+import EmotionalJourneyMap from "./EmotionalJourneyMap";
+import ReflectionWordCloud from "./ReflectionWordCloud";
+import CompletionRings from "./CompletionRings";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -261,25 +264,32 @@ const Dashboard = () => {
             )}
           </div>
 
-          <div className="dashboard-section">
-            <h2>Quick Actions</h2>
-            <div className="quick-actions">
-              <button
-                onClick={() => navigate("/goal-setting")}
-                className="quick-action-btn"
-              >
-                <span className="action-icon">🎯</span>
-                <span>Manage Goals</span>
-              </button>
-              <button
-                onClick={() => navigate("/journal")}
-                className="quick-action-btn"
-              >
-                <span className="action-icon">📝</span>
-                <span>Write Journal</span>
-              </button>
-            </div>
-          </div>
+          {/* Progress Visualizations - Show for main goal */}
+          {goals && goals.id && (
+            <>
+              <div className="dashboard-section">
+                <h2>📊 Progress at a Glance</h2>
+                <p className="section-subtitle">
+                  Overview of your main goal's progress
+                </p>
+                <CompletionRings
+                  goalId={goals.id}
+                  mandalartData={goals}
+                  apiService={apiService}
+                />
+              </div>
+
+              <div className="dashboard-section">
+                <h2>💭 Your Emotional Journey</h2>
+                <EmotionalJourneyMap goalId={goals.id} />
+              </div>
+
+              <div className="dashboard-section">
+                <h2>☁️ Words of Reflection</h2>
+                <ReflectionWordCloud goalId={goals.id} />
+              </div>
+            </>
+          )}
         </div>
       </main>
 

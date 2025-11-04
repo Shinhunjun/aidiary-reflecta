@@ -30,3 +30,6 @@ reflecta-backend/.env
 reflecta-backend/.env.local
 reflecta-backend/.env.backup
 reflecta-backend/.env.yaml
+
+# MCP Configuration
+.env.mcp

@@ -121,7 +121,16 @@ const Journal = () => {
         tags: [],
       });
 
-      alert("Journal entry saved successfully!");
+      // Show success message with goal mapping info
+      if (newEntry.goalMapping && newEntry.goalMapping.goalId) {
+        alert(
+          `✅ Journal entry saved successfully!\n\n🎯 Automatically linked to your goal with ${Math.round(
+            newEntry.goalMapping.confidence * 100
+          )}% confidence.\n\nReason: ${newEntry.goalMapping.reason}`
+        );
+      } else {
+        alert("Journal entry saved successfully!");
+      }
     } catch (error) {
       console.error("Error saving journal entry:", error);
       alert("Failed to save journal entry. Please try again.");

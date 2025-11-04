@@ -45,6 +45,53 @@
   color: #2d3436;
 }
 
+/* Narrative Style Header */
+.narrative-header {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  margin: -30px -30px 30px -30px;
+}
+
+.header-content h3 {
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.header-subtitle {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.narrative-header .timeline-filters {
+  width: 100%;
+  justify-content: center;
+}
+
+.narrative-header .filter-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.narrative-header .filter-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.narrative-header .filter-btn.active {
+  background: white;
+  border-color: white;
+  color: #667eea;
+}
+
 .timeline-filters {
   display: flex;
   gap: 8px;
@@ -457,5 +504,292 @@
   .filter-btn {
     padding: 6px 12px;
     font-size: 13px;
+  }
+}
+
+/* ========================================
+   NARRATIVE STORYTELLING STYLES
+   ======================================== */
+
+/* Story Cards with Variable Sizing */
+.story-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.story-card.large {
+  transform: scale(1.05);
+  box-shadow: 0 10px 40px rgba(108, 92, 231, 0.2);
+  border: 3px solid #6c5ce7;
+}
+
+.story-card.medium {
+  border: 2px solid #a29bfe;
+}
+
+.story-card.small {
+  opacity: 0.9;
+}
+
+.story-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.story-card.large:hover {
+  transform: scale(1.08);
+}
+
+/* Celebration Header */
+.celebration-header {
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  z-index: 10;
+}
+
+.celebration-emoji-large {
+  font-size: 60px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Narrative Card Header */
+.card-date-top {
+  display: inline-block;
+  font-size: 12px;
+  color: #b2bec3;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.card-title-narrative {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2d3436;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.story-card.large .card-title-narrative {
+  font-size: 28px;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Description with Quotes */
+.card-description-narrative {
+  font-size: 16px;
+  color: #636e72;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-style: italic;
+  padding-left: 20px;
+  border-left: 4px solid #ffeaa7;
+}
+
+.story-card.large .card-description-narrative {
+  font-size: 18px;
+  padding-left: 30px;
+}
+
+/* Notes as Personal Reflections */
+.card-notes-narrative {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  padding: 25px;
+  border-radius: 12px;
+  margin: 20px 0;
+  position: relative;
+  border: 2px solid #e9ecef;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.notes-quote-mark {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  font-size: 60px;
+  color: #6c5ce7;
+  opacity: 0.15;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.notes-text {
+  font-size: 15px;
+  color: #2d3436;
+  line-height: 1.8;
+  margin: 0 0 15px 0;
+  position: relative;
+  z-index: 1;
+  font-style: italic;
+}
+
+.story-card.large .notes-text {
+  font-size: 17px;
+}
+
+.notes-signature {
+  text-align: right;
+  font-size: 13px;
+  color: #6c5ce7;
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Meta Pills (Redesigned) */
+.card-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.meta-pill {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: capitalize;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.meta-pill:hover {
+  transform: translateY(-2px);
+}
+
+.meta-pill.mood {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  color: #2d3436;
+}
+
+.meta-pill.time {
+  background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+  color: #2d3436;
+}
+
+.meta-pill.completion {
+  background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+  color: white;
+}
+
+/* Tags Narrative Style */
+.card-tags-narrative {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.tag-narrative {
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(108, 92, 231, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.tag-narrative:hover {
+  transform: scale(1.05);
+}
+
+/* Milestone Ribbon */
+.milestone-ribbon {
+  position: absolute;
+  top: 20px;
+  left: -10px;
+  background: linear-gradient(135deg, #ffd93d 0%, #ffb700 100%);
+  color: #2d3436;
+  padding: 8px 20px 8px 15px;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 4px 12px rgba(255, 217, 61, 0.4);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+  animation: slideInFromLeft 0.6s ease-out;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.ribbon-icon {
+  font-size: 16px;
+}
+
+.ribbon-text {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive adjustments for narrative style */
+@media (max-width: 768px) {
+  .narrative-header {
+    margin: -20px -20px 20px -20px;
+    padding: 20px 15px;
+  }
+
+  .header-content h3 {
+    font-size: 24px;
+  }
+
+  .header-subtitle {
+    font-size: 14px;
+  }
+
+  .celebration-emoji-large {
+    font-size: 40px;
+  }
+
+  .card-title-narrative {
+    font-size: 18px;
+  }
+
+  .story-card.large .card-title-narrative {
+    font-size: 22px;
+  }
+
+  .card-notes-narrative {
+    padding: 20px;
+  }
+
+  .notes-text {
+    font-size: 14px;
+  }
+
+  .milestone-ribbon {
+    font-size: 11px;
+    padding: 6px 15px 6px 12px;
   }
 }

@@ -7,7 +7,7 @@ const { body, validationResult } = require("express-validator");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
@@ -78,6 +78,142 @@ const getTimelineFormat = (period = "weekly") => {
   }
 };
 
+// Helper function: Analyze journal content and map to goals using GPT
+const analyzeGoalMapping = async (userId, content) => {
+  try {
+    // Get all user goals
+    const Goal = require("./models/Goal");
+    const goals = await Goal.find({ userId });
+    const flattenedGoals = [];
+
+    goals.forEach((goal) => {
+      if (goal.mandalartData) {
+        flattenedGoals.push({
+          id: goal.mandalartData.id,
+          text: goal.mandalartData.text,
+          type: "main",
+          description: goal.mandalartData.description || "",
+        });
+
+        if (goal.mandalartData.subGoals) {
+          goal.mandalartData.subGoals.forEach((subGoal) => {
+            if (subGoal && subGoal.text) {
+              flattenedGoals.push({
+                id: subGoal.id,
+                text: subGoal.text,
+                type: "sub",
+                description: subGoal.description || "",
+              });
+
+              if (subGoal.subGoals) {
+                subGoal.subGoals.forEach((subSubGoal) => {
+                  if (subSubGoal && subSubGoal.text) {
+                    flattenedGoals.push({
+                      id: subSubGoal.id,
+                      text: subSubGoal.text,
+                      type: "sub-sub",
+                      description: subSubGoal.description || "",
+                    });
+                  }
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+
+    if (flattenedGoals.length === 0) {
+      return { relatedGoalId: null, relatedGoalType: null, confidence: 0 };
+    }
+
+    // Check if OpenAI API is configured
+    if (
+      !process.env.OPENAI_API_KEY ||
+      process.env.OPENAI_API_KEY === "your_openai_api_key_here"
+    ) {
+      console.log("OpenAI API key not configured, skipping goal mapping");
+      return { relatedGoalId: null, relatedGoalType: null, confidence: 0 };
+    }
+
+    // Create goals context for GPT
+    const goalsContext = flattenedGoals
+      .map(
+        (goal) =>
+          `- ${goal.type.toUpperCase()}: "${goal.text}" (ID: ${goal.id})${
+            goal.description ? ` - ${goal.description}` : ""
+          }`
+      )
+      .join("\n");
+
+    const systemPrompt = `You are an AI assistant that analyzes diary entries and matches them to user goals.
+
+User's Goals:
+${goalsContext}
+
+Analyze the following diary content and determine if it relates to any of the user's goals. Consider:
+1. Direct mentions of goal topics
+2. Related activities or progress
+3. Emotional connections to goals
+4. Indirect references to goal themes
+
+Return your analysis in this exact JSON format:
+{
+  "relatedGoalId": "goal-id-if-found-or-null",
+  "relatedGoalType": "main-or-sub-or-sub-sub-or-null",
+  "confidence": 0.0-1.0,
+  "reason": "brief explanation"
+}
+
+Only match if confidence is above 0.3. Be conservative.`;
+
+    const response = await fetch(
+      process.env.OPENAI_API_URL ||
+        "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: content },
+          ],
+          max_tokens: 300,
+          temperature: 0.3,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      return { relatedGoalId: null, relatedGoalType: null, confidence: 0 };
+    }
+
+    const aiResponse = data.choices[0].message.content;
+    const analysis = JSON.parse(aiResponse);
+
+    // Only return mapping if confidence is above threshold
+    if (analysis.confidence >= 0.3) {
+      return {
+        relatedGoalId: analysis.relatedGoalId,
+        relatedGoalType: analysis.relatedGoalType,
+        confidence: analysis.confidence,
+        reason: analysis.reason,
+      };
+    }
+
+    return { relatedGoalId: null, relatedGoalType: null, confidence: 0 };
+  } catch (error) {
+    console.error("Error in analyzeGoalMapping:", error);
+    return { relatedGoalId: null, relatedGoalType: null, confidence: 0 };
+  }
+};
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/reflecta", {
@@ -95,6 +231,7 @@ const ChatSession = require("./models/ChatSession");
 const GoalProgress = require("./models/GoalProgress");
 const RiskAlert = require("./models/RiskAlert");
 const GoalSummary = require("./models/GoalSummary");
+const Persona = require("./models/Persona");
 
 // Middleware and Services
 const { requireRole, canAccessStudent, canModifyAlert } = require("./middleware/authorization");
@@ -417,69 +554,27 @@ app.post(
         relatedGoalType,
       } = req.body;
 
-      // If no goal mapping provided, try to analyze the content
+      // If no goal mapping provided, use GPT to analyze the content for ALL entries
       let finalRelatedGoalId = relatedGoalId || null;
       let finalRelatedGoalType = relatedGoalType || null;
+      let mappingConfidence = 0;
+      let mappingReason = "";
 
-      if (!finalRelatedGoalId && isAIGenerated) {
+      if (!finalRelatedGoalId) {
         try {
-          // Get user's goals structure for analysis
-          const goals = await Goal.find({ userId: req.user.userId });
-          const flattenedGoals = [];
+          console.log("Analyzing goal mapping for journal entry...");
+          const mapping = await analyzeGoalMapping(req.user.userId, content);
 
-          goals.forEach((goal) => {
-            if (goal.mandalartData) {
-              // Main goal
-              flattenedGoals.push({
-                id: goal.mandalartData.id,
-                text: goal.mandalartData.text,
-                type: "main",
-                description: goal.mandalartData.description || "",
-              });
-
-              // Sub-goals
-              if (goal.mandalartData.subGoals) {
-                goal.mandalartData.subGoals.forEach((subGoal) => {
-                  if (subGoal && subGoal.text) {
-                    flattenedGoals.push({
-                      id: subGoal.id,
-                      text: subGoal.text,
-                      type: "sub",
-                      description: subGoal.description || "",
-                    });
-
-                    // Sub-sub-goals
-                    if (subGoal.subGoals) {
-                      subGoal.subGoals.forEach((subSubGoal) => {
-                        if (subSubGoal && subSubGoal.text) {
-                          flattenedGoals.push({
-                            id: subSubGoal.id,
-                            text: subSubGoal.text,
-                            type: "sub-sub",
-                            description: subSubGoal.description || "",
-                          });
-                        }
-                      });
-                    }
-                  }
-                });
-              }
-            }
-          });
-
-          // Simple keyword matching for goal mapping
-          const contentLower = content.toLowerCase();
-          if (
-            contentLower.includes("run") ||
-            contentLower.includes("running")
-          ) {
-            const runGoal = flattenedGoals.find(
-              (goal) => goal.text && goal.text.toLowerCase().includes("run")
+          if (mapping.relatedGoalId) {
+            finalRelatedGoalId = mapping.relatedGoalId;
+            finalRelatedGoalType = mapping.relatedGoalType;
+            mappingConfidence = mapping.confidence;
+            mappingReason = mapping.reason;
+            console.log(
+              `Mapped journal to goal ${finalRelatedGoalId} with confidence ${mappingConfidence}`
             );
-            if (runGoal) {
-              finalRelatedGoalId = runGoal.id;
-              finalRelatedGoalType = runGoal.type;
-            }
+          } else {
+            console.log("No suitable goal mapping found");
           }
         } catch (error) {
           console.error("Error analyzing goal mapping:", error);
@@ -499,9 +594,59 @@ app.post(
       });
 
       await entry.save();
-      res
-        .status(201)
-        .json({ message: "Journal entry saved successfully", entry });
+
+      // Also create a GoalProgress record if the entry is mapped to a goal
+      // This enables dashboard visualizations to display journal-based progress
+      if (finalRelatedGoalId) {
+        try {
+          // Estimate reading/writing time based on content length (rough: 200 chars/min)
+          const estimatedTimeSpent = Math.max(
+            5,
+            Math.ceil(content.length / 200)
+          );
+
+          const progress = new GoalProgress({
+            userId: req.user.userId,
+            goalId: finalRelatedGoalId,
+            subGoalId:
+              finalRelatedGoalType === "sub" ||
+              finalRelatedGoalType === "sub-sub"
+                ? finalRelatedGoalId
+                : null,
+            progressType: "reflection",
+            title: title,
+            description: content.substring(0, 200), // First 200 chars
+            date: new Date(),
+            mood: mood,
+            tags: tags || [],
+            isAIGenerated: isAIGenerated,
+            notes: content,
+            timeSpent: estimatedTimeSpent,
+            isMilestone: false,
+          });
+
+          await progress.save();
+          console.log(
+            `Created GoalProgress record for journal entry: ${entry._id}`
+          );
+        } catch (progressError) {
+          console.error("Error creating GoalProgress record:", progressError);
+          // Don't fail the journal save if progress creation fails
+        }
+      }
+
+      res.status(201).json({
+        message: "Journal entry saved successfully",
+        entry,
+        goalMapping: finalRelatedGoalId
+          ? {
+              goalId: finalRelatedGoalId,
+              goalType: finalRelatedGoalType,
+              confidence: mappingConfidence,
+              reason: mappingReason,
+            }
+          : null,
+      });
     } catch (error) {
       console.error("Save journal entry error:", error);
       res.status(500).json({ error: "Internal server error" });
@@ -1174,23 +1319,310 @@ app.get(
   }
 );
 
+// Emotional Journey endpoint for subjective progress visualization
+app.get(
+  "/api/goals/:goalId/emotional-journey",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { goalId } = req.params;
+      const userId = mongoose.Types.ObjectId.isValid(req.user.userId)
+        ? new mongoose.Types.ObjectId(req.user.userId)
+        : req.user.userId;
+
+      // Get progress entries with mood and notes
+      const progressEntries = await GoalProgress.find({
+        userId,
+        goalId,
+      })
+        .sort({ date: 1 }) // Ascending order for journey timeline
+        .lean();
+
+      if (progressEntries.length === 0) {
+        return res.json({
+          journey: [],
+          moodTrend: null,
+          significantMoments: [],
+          emotionalSummary: null,
+        });
+      }
+
+      // Map mood to numeric values for trend analysis
+      const moodValues = {
+        happy: 8,
+        excited: 9,
+        grateful: 8.5,
+        calm: 7,
+        neutral: 5,
+        reflective: 6,
+        anxious: 3,
+        sad: 2,
+      };
+
+      // Process journey data
+      const journey = progressEntries.map((entry) => ({
+        date: entry.date,
+        mood: entry.mood,
+        moodValue: moodValues[entry.mood] || 5,
+        title: entry.title,
+        description: entry.description,
+        notes: entry.notes,
+        isMilestone: entry.isMilestone,
+        milestoneTitle: entry.milestoneTitle,
+        celebrationEmoji: entry.celebrationEmoji,
+        completionPercentage: entry.completionPercentage || 0,
+        timeSpent: entry.timeSpent || 0,
+        tags: entry.tags || [],
+      }));
+
+      // Identify significant moments (milestones or high-impact entries)
+      const significantMoments = progressEntries
+        .filter((entry) => {
+          return (
+            entry.isMilestone ||
+            (entry.notes && entry.notes.length > 100) ||
+            (entry.completionPercentage && entry.completionPercentage >= 75) ||
+            entry.celebrationEmoji
+          );
+        })
+        .map((entry) => ({
+          date: entry.date,
+          title: entry.milestoneTitle || entry.title,
+          description: entry.description,
+          notes: entry.notes,
+          type: entry.isMilestone ? "milestone" : "significant",
+          emoji: entry.celebrationEmoji || "⭐",
+          mood: entry.mood,
+        }))
+        .slice(-10); // Last 10 significant moments
+
+      // Calculate mood trend
+      const recentMoodValues = journey.slice(-10).map((e) => e.moodValue);
+      const earlyMoodValues = journey.slice(0, 10).map((e) => e.moodValue);
+      const recentAvg =
+        recentMoodValues.reduce((a, b) => a + b, 0) / recentMoodValues.length;
+      const earlyAvg =
+        earlyMoodValues.reduce((a, b) => a + b, 0) / earlyMoodValues.length || recentAvg;
+
+      let moodTrendDirection = "stable";
+      let moodTrendMessage = "Your emotional state has been consistent";
+
+      if (recentAvg > earlyAvg + 1) {
+        moodTrendDirection = "improving";
+        moodTrendMessage = "Your mood has been improving over time - that's beautiful growth! 🌱";
+      } else if (recentAvg < earlyAvg - 1) {
+        moodTrendDirection = "declining";
+        moodTrendMessage = "You've been facing some challenges lately. Remember, difficult days are part of the journey.";
+      } else {
+        moodTrendMessage = "You've maintained steady emotional balance throughout this goal 🌊";
+      }
+
+      // Generate emotional summary
+      const moodCounts = {};
+      progressEntries.forEach((entry) => {
+        if (entry.mood) {
+          moodCounts[entry.mood] = (moodCounts[entry.mood] || 0) + 1;
+        }
+      });
+      const dominantMood = Object.entries(moodCounts).sort(
+        (a, b) => b[1] - a[1]
+      )[0];
+
+      const moodEmojis = {
+        happy: "😊",
+        excited: "🎉",
+        calm: "😌",
+        grateful: "🙏",
+        neutral: "😐",
+        anxious: "😰",
+        sad: "😢",
+        reflective: "🤔",
+      };
+
+      const emotionalSummary = {
+        dominantMood: dominantMood ? dominantMood[0] : "neutral",
+        dominantMoodEmoji: dominantMood ? moodEmojis[dominantMood[0]] : "😐",
+        dominantMoodPercentage: dominantMood
+          ? Math.round((dominantMood[1] / progressEntries.length) * 100)
+          : 0,
+        moodDistribution: moodCounts,
+        totalEntries: progressEntries.length,
+        milestonesCount: significantMoments.filter((m) => m.type === "milestone")
+          .length,
+      };
+
+      res.json({
+        goalId,
+        journey,
+        moodTrend: {
+          direction: moodTrendDirection,
+          message: moodTrendMessage,
+          recentAverage: recentAvg,
+          earlyAverage: earlyAvg,
+        },
+        significantMoments,
+        emotionalSummary,
+      });
+    } catch (error) {
+      console.error("Get emotional journey error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
+
+// Narrative Timeline endpoint for storytelling visualization
+app.get(
+  "/api/goals/:goalId/narrative-timeline",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { goalId } = req.params;
+      const userId = mongoose.Types.ObjectId.isValid(req.user.userId)
+        ? new mongoose.Types.ObjectId(req.user.userId)
+        : req.user.userId;
+
+      // Get progress entries sorted by significance
+      const progressEntries = await GoalProgress.find({
+        userId,
+        goalId,
+      })
+        .sort({ date: -1 })
+        .lean();
+
+      if (progressEntries.length === 0) {
+        return res.json({
+          timeline: [],
+          story: {
+            beginning: null,
+            recentMilestones: [],
+            currentState: null,
+          },
+        });
+      }
+
+      // Calculate significance score for each entry
+      const timeline = progressEntries.map((entry) => {
+        let significanceScore = 0;
+
+        // Milestones are highly significant
+        if (entry.isMilestone) significanceScore += 10;
+
+        // Long, thoughtful notes
+        if (entry.notes && entry.notes.length > 150) significanceScore += 5;
+        else if (entry.notes && entry.notes.length > 50) significanceScore += 3;
+
+        // High completion percentage
+        if (entry.completionPercentage >= 90) significanceScore += 4;
+        else if (entry.completionPercentage >= 50) significanceScore += 2;
+
+        // Long time investment
+        if (entry.timeSpent >= 120) significanceScore += 3;
+        else if (entry.timeSpent >= 60) significanceScore += 2;
+
+        // Celebration emoji present
+        if (entry.celebrationEmoji) significanceScore += 2;
+
+        // Rich description
+        if (entry.description && entry.description.length > 100)
+          significanceScore += 2;
+
+        return {
+          ...entry,
+          significanceScore,
+          displaySize: significanceScore >= 10 ? "large" : significanceScore >= 5 ? "medium" : "small",
+        };
+      });
+
+      // Create narrative structure
+      const story = {
+        beginning: progressEntries[progressEntries.length - 1], // First ever entry
+        recentMilestones: timeline
+          .filter((entry) => entry.isMilestone)
+          .slice(0, 5), // Last 5 milestones
+        currentState: {
+          lastEntry: progressEntries[0],
+          totalTime: progressEntries.reduce((sum, e) => sum + (e.timeSpent || 0), 0),
+          entryCount: progressEntries.length,
+          daysSinceStart: Math.floor(
+            (new Date() - new Date(progressEntries[progressEntries.length - 1].date)) /
+              (1000 * 60 * 60 * 24)
+          ),
+        },
+      };
+
+      res.json({
+        goalId,
+        timeline,
+        story,
+      });
+    } catch (error) {
+      console.error("Get narrative timeline error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+);
+
 // Goal Related Journal Entries Routes
 app.get("/api/goals/:goalId/journals", authenticateToken, async (req, res) => {
   try {
     const { goalId } = req.params;
-    console.log(
-      "Getting journals for goalId:",
-      goalId,
-      "userId:",
-      req.user?.userId
-    );
+    const userId = req.user.userId;
+    console.log("Getting journals for goalId:", goalId, "userId:", userId);
 
-    const journals = await JournalEntry.find({
-      userId: req.user.userId,
-      relatedGoalId: goalId,
+    // Find the goal structure to get child goal IDs
+    const goal = await Goal.findOne({
+      userId: userId,
+      $or: [
+        { "mandalartData.id": goalId },
+        { "mandalartData.subGoals.id": goalId },
+      ]
+    });
+
+    let goalIds = [goalId]; // Start with the requested goal
+
+    if (goal) {
+      // Find if this is a sub-goal with children
+      const findGoalAndChildren = (data, id) => {
+        if (data.id === id) {
+          if (data.subGoals && data.subGoals.length > 0) {
+            return data.subGoals.filter(sg => sg && sg.id).map(sg => sg.id);
+          }
+          return [];
+        }
+        if (data.subGoals) {
+          for (const sg of data.subGoals) {
+            if (sg) {
+              const result = findGoalAndChildren(sg, id);
+              if (result !== null) return result;
+            }
+          }
+        }
+        return null;
+      };
+
+      const childIds = findGoalAndChildren(goal.mandalartData, goalId);
+      if (childIds && childIds.length > 0) {
+        goalIds = [goalId, ...childIds];
+        console.log("Including child goal IDs:", childIds);
+      }
+    }
+
+    // Fetch journals for the goal and all its children
+    let journals = await JournalEntry.find({
+      userId: userId,
+      relatedGoalId: { $in: goalIds },
     }).sort({ date: -1 });
 
-    console.log("Found journals:", journals.length);
+    // If no goal-specific journals found, return all user journals
+    // This handles the case where journals weren't mapped to goals yet
+    if (journals.length === 0) {
+      console.log("No goal-specific journals found, returning all user journals");
+      journals = await JournalEntry.find({ userId: userId })
+        .sort({ date: -1 })
+        .limit(50); // Limit to most recent 50 entries
+    }
+
+    console.log(`Found ${journals.length} journals for goal and its children`);
     res.json(journals);
   } catch (error) {
     console.error("Get goal journals error:", error);
@@ -1223,14 +1655,22 @@ app.get("/api/goals/:goalId/journals/summary", authenticateToken, async (req, re
     }
 
     // Get journals for this goal
-    const journals = await JournalEntry.find({
+    let journals = await JournalEntry.find({
       userId: userId,
       relatedGoalId: goalId,
     }).sort({ date: -1 }).limit(20); // Last 20 entries
 
+    // If no goal-specific journals found, use all user journals
+    if (journals.length === 0) {
+      console.log("No goal-specific journals found for summary, using all user journals");
+      journals = await JournalEntry.find({ userId: userId })
+        .sort({ date: -1 })
+        .limit(20); // Last 20 entries
+    }
+
     if (journals.length === 0) {
       return res.json({
-        summary: "No journal entries found for this goal yet. Start journaling to see insights!",
+        summary: "No journal entries found yet. Start journaling to see insights!",
         entryCount: 0,
         dateRange: null,
         moodDistribution: {},
@@ -2049,6 +2489,175 @@ Only match if confidence is above 0.3. Be conservative - it's better to not matc
   }
 });
 
+// ============================================
+// Persona Routes (for AI Chat Personalities)
+// ============================================
+
+// Get all personas (default + user's custom personas)
+app.get("/api/personas", authenticateToken, async (req, res) => {
+  try {
+    // Get all default personas + user's custom personas
+    const personas = await Persona.find({
+      $or: [
+        { isDefault: true },
+        { userId: req.user.userId }
+      ]
+    }).sort({ isDefault: -1, createdAt: -1 });
+
+    res.json(personas);
+  } catch (error) {
+    console.error("Get personas error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Get a single persona by ID
+app.get("/api/personas/:id", authenticateToken, async (req, res) => {
+  try {
+    const persona = await Persona.findById(req.params.id);
+
+    if (!persona) {
+      return res.status(404).json({ error: "Persona not found" });
+    }
+
+    // Check access: either default persona or user's own custom persona
+    if (!persona.isDefault && persona.userId?.toString() !== req.user.userId) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    res.json(persona);
+  } catch (error) {
+    console.error("Get persona error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Create a custom persona
+app.post("/api/personas", authenticateToken, async (req, res) => {
+  try {
+    const {
+      name,
+      displayName,
+      description,
+      systemPrompt,
+      category,
+      color,
+      icon,
+      avatarUrl
+    } = req.body;
+
+    // Validate required fields
+    if (!name || !displayName || !description || !systemPrompt || !category) {
+      return res.status(400).json({
+        error: "Missing required fields: name, displayName, description, systemPrompt, category"
+      });
+    }
+
+    // Check if persona name already exists for this user
+    const existingPersona = await Persona.findOne({
+      name,
+      userId: req.user.userId
+    });
+
+    if (existingPersona) {
+      return res.status(400).json({
+        error: "You already have a persona with this name"
+      });
+    }
+
+    // Create new custom persona
+    const persona = new Persona({
+      name,
+      displayName,
+      description,
+      systemPrompt,
+      category,
+      color: color || "#8b5cf6",
+      icon: icon || "✨",
+      avatarUrl: avatarUrl || "",
+      isDefault: false,
+      userId: req.user.userId
+    });
+
+    await persona.save();
+    res.status(201).json(persona);
+  } catch (error) {
+    console.error("Create persona error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Update a custom persona
+app.put("/api/personas/:id", authenticateToken, async (req, res) => {
+  try {
+    const persona = await Persona.findById(req.params.id);
+
+    if (!persona) {
+      return res.status(404).json({ error: "Persona not found" });
+    }
+
+    // Can only update own custom personas (not default personas)
+    if (persona.isDefault) {
+      return res.status(403).json({ error: "Cannot modify default personas" });
+    }
+
+    if (persona.userId?.toString() !== req.user.userId) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    // Update allowed fields
+    const {
+      displayName,
+      description,
+      systemPrompt,
+      category,
+      color,
+      icon,
+      avatarUrl
+    } = req.body;
+
+    if (displayName) persona.displayName = displayName;
+    if (description) persona.description = description;
+    if (systemPrompt) persona.systemPrompt = systemPrompt;
+    if (category) persona.category = category;
+    if (color) persona.color = color;
+    if (icon) persona.icon = icon;
+    if (avatarUrl !== undefined) persona.avatarUrl = avatarUrl;
+
+    await persona.save();
+    res.json(persona);
+  } catch (error) {
+    console.error("Update persona error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Delete a custom persona
+app.delete("/api/personas/:id", authenticateToken, async (req, res) => {
+  try {
+    const persona = await Persona.findById(req.params.id);
+
+    if (!persona) {
+      return res.status(404).json({ error: "Persona not found" });
+    }
+
+    // Can only delete own custom personas (not default personas)
+    if (persona.isDefault) {
+      return res.status(403).json({ error: "Cannot delete default personas" });
+    }
+
+    if (persona.userId?.toString() !== req.user.userId) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    await Persona.findByIdAndDelete(req.params.id);
+    res.json({ message: "Persona deleted successfully" });
+  } catch (error) {
+    console.error("Delete persona error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Chat Routes
 app.get("/api/chat", authenticateToken, async (req, res) => {
   try {
@@ -2227,10 +2836,35 @@ The user will provide a goal description. Your task is to:
   }
 });
 
-// Enhanced Chat API with goal context
+// Enhanced Chat API with goal context and persona support
 app.post("/api/chat/enhanced", authenticateToken, async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, personaId } = req.body;
+
+    // Get selected persona or use default
+    let selectedPersona;
+    if (personaId) {
+      selectedPersona = await Persona.findById(personaId);
+      // Verify user has access to this persona (either default or their own)
+      if (selectedPersona && !selectedPersona.isDefault && selectedPersona.userId?.toString() !== req.user.userId) {
+        selectedPersona = null; // Fallback to default
+      }
+    }
+
+    // If no persona specified or invalid persona, get default "Empathetic Listener"
+    if (!selectedPersona) {
+      selectedPersona = await Persona.findOne({
+        isDefault: true,
+        name: "empathetic-listener"
+      });
+    }
+
+    // Fallback if default persona doesn't exist (shouldn't happen after seeding)
+    if (!selectedPersona) {
+      return res.status(500).json({
+        error: "No persona found. Please run seed script: node seedDefaultPersonas.js"
+      });
+    }
 
     // Get user's goals and recent progress for context
     const goals = await Goal.find({ userId: req.user.userId });
@@ -2279,14 +2913,8 @@ app.post("/api/chat/enhanced", authenticateToken, async (req, res) => {
       }
     }
 
-    const systemPrompt = `You are a helpful and supportive AI assistant for a personal reflection and goal-setting app called Reflecta. 
-    Your role is to help users reflect on their thoughts, feelings, and experiences, and provide gentle guidance for personal growth.
-    Be empathetic, encouraging, and non-judgmental. Ask thoughtful questions to help users explore their thoughts more deeply.
-    Keep responses concise but meaningful.
-    
-    IMPORTANT: When users mention progress or achievements related to their goals, celebrate their success! 
-    Acknowledge their hard work and encourage them to continue. If they've completed goals or made significant progress, 
-    be enthusiastic and supportive.${goalContext}`;
+    // Use persona's system prompt with goal context appended
+    const systemPrompt = `${selectedPersona.systemPrompt}${goalContext}`;
 
     const response = await fetch(
       process.env.OPENAI_API_URL ||
@@ -2315,7 +2943,14 @@ app.post("/api/chat/enhanced", authenticateToken, async (req, res) => {
     // Save to chat session
     let session = await ChatSession.findOne({ userId: req.user.userId });
     if (!session) {
-      session = new ChatSession({ userId: req.user.userId, messages: [] });
+      session = new ChatSession({
+        userId: req.user.userId,
+        messages: [],
+        selectedPersonaId: selectedPersona._id
+      });
+    } else {
+      // Update selected persona if changed
+      session.selectedPersonaId = selectedPersona._id;
     }
 
     session.messages.push(
@@ -2335,7 +2970,14 @@ app.post("/api/chat/enhanced", authenticateToken, async (req, res) => {
 
     await session.save();
 
-    res.json({ message: aiMessage });
+    res.json({
+      message: aiMessage,
+      persona: {
+        id: selectedPersona._id,
+        name: selectedPersona.displayName,
+        icon: selectedPersona.icon
+      }
+    });
   } catch (error) {
     console.error("Enhanced chat error:", error);
     res.status(500).json({ error: "Internal server error" });

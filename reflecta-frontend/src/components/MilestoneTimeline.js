@@ -16,16 +16,21 @@ const MilestoneTimeline = ({ goalId, apiService }) => {
   const loadTimeline = async () => {
     try {
       setLoading(true);
-      const [analyticsData, progressData] = await Promise.all([
+      const [narrativeData, analyticsData] = await Promise.all([
+        apiService.getGoalNarrativeTimeline(goalId),
         apiService.getGoalProgressAnalytics(goalId),
-        apiService.getGoalProgress(goalId),
       ]);
 
-      if (analyticsData.milestones) {
-        setMilestones(analyticsData.milestones);
+      if (narrativeData && narrativeData.timeline) {
+        setAllProgress(narrativeData.timeline);
+
+        // Extract milestones from story for summary
+        if (narrativeData.story && narrativeData.story.recentMilestones) {
+          setMilestones(narrativeData.story.recentMilestones);
+        }
       }
-      if (progressData) {
-        setAllProgress(progressData);
+      if (analyticsData.milestones && milestones.length === 0) {
+        setMilestones(analyticsData.milestones);
       }
     } catch (err) {
       console.error("Failed to load timeline:", err);
@@ -102,27 +107,32 @@ const MilestoneTimeline = ({ goalId, apiService }) => {
   const timelineItems = getTimelineItems();
 
   return (
-    <div className="milestone-timeline">
-      <div className="timeline-header">
-        <h3>Progress Timeline</h3>
+    <div className="milestone-timeline narrative-style">
+      <div className="timeline-header narrative-header">
+        <div className="header-content">
+          <h3>📖 Your Journey</h3>
+          <p className="header-subtitle">
+            Every step you take is part of your story
+          </p>
+        </div>
         <div className="timeline-filters">
           <button
             className={`filter-btn ${filter === "all" ? "active" : ""}`}
             onClick={() => setFilter("all")}
           >
-            All
+            All Moments
           </button>
           <button
             className={`filter-btn ${filter === "milestone" ? "active" : ""}`}
             onClick={() => setFilter("milestone")}
           >
-            Milestones
+            ⭐ Milestones
           </button>
           <button
             className={`filter-btn ${filter === "completion" ? "active" : ""}`}
             onClick={() => setFilter("completion")}
           >
-            Completions
+            🎉 Completions
           </button>
         </div>
       </div>
@@ -141,10 +151,15 @@ const MilestoneTimeline = ({ goalId, apiService }) => {
               ? getMilestoneColor(item.milestoneCategory)
               : "#dfe6e9";
 
+            // Get display size from backend significance score
+            const displaySize = item.displaySize || (isMilestone ? "large" : "small");
+
             return (
               <div
                 key={item._id || index}
-                className={`timeline-item ${isMilestone ? "milestone" : "regular"}`}
+                className={`timeline-item narrative-card ${displaySize} ${
+                  isMilestone ? "milestone" : "regular"
+                }`}
               >
                 <div
                   className="timeline-marker"
@@ -159,62 +174,86 @@ const MilestoneTimeline = ({ goalId, apiService }) => {
                 </div>
 
                 <div className="timeline-content">
-                  <div className="timeline-card">
+                  <div className={`timeline-card story-card ${displaySize}`}>
+                    {isMilestone && item.celebrationEmoji && (
+                      <div className="celebration-header">
+                        <span className="celebration-emoji-large">
+                          {item.celebrationEmoji}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="card-header">
-                      <h4>{item.milestoneTitle || item.title}</h4>
-                      <span className="card-date">{formatDate(item.date)}</span>
+                      <span className="card-date-top">{formatDate(item.date)}</span>
                     </div>
 
-                    <p className="card-description">{item.description}</p>
+                    <h4 className="card-title-narrative">
+                      {item.milestoneTitle || item.title}
+                    </h4>
 
-                    <div className="card-meta">
-                      {item.progressType && (
-                        <span className={`meta-badge ${item.progressType}`}>
-                          {item.progressType}
-                        </span>
-                      )}
+                    {item.description && (
+                      <p className="card-description-narrative">
+                        "{item.description}"
+                      </p>
+                    )}
+
+                    {item.notes && (
+                      <div className="card-notes-narrative">
+                        <div className="notes-quote-mark">"</div>
+                        <p className="notes-text">{item.notes}</p>
+                        <div className="notes-signature">
+                          — Your reflection
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="card-meta-row">
                       {item.mood && (
-                        <span className="meta-badge mood">
+                        <span className="meta-pill mood">
+                          {item.mood === "happy"
+                            ? "😊"
+                            : item.mood === "excited"
+                            ? "🎉"
+                            : item.mood === "grateful"
+                            ? "🙏"
+                            : item.mood === "calm"
+                            ? "😌"
+                            : item.mood === "anxious"
+                            ? "😰"
+                            : item.mood === "sad"
+                            ? "😢"
+                            : item.mood === "reflective"
+                            ? "🤔"
+                            : "😐"}{" "}
                           {item.mood}
                         </span>
                       )}
-                      {item.difficulty && (
-                        <span className={`meta-badge difficulty-${item.difficulty}`}>
-                          {item.difficulty}
-                        </span>
-                      )}
                       {item.timeSpent > 0 && (
-                        <span className="meta-badge time">
-                          {item.timeSpent}min
+                        <span className="meta-pill time">
+                          ⏱️ {item.timeSpent} min
                         </span>
                       )}
                       {item.completionPercentage > 0 && (
-                        <span className="meta-badge completion">
-                          {item.completionPercentage}%
+                        <span className="meta-pill completion">
+                          ✓ {item.completionPercentage}%
                         </span>
                       )}
                     </div>
 
                     {item.tags && item.tags.length > 0 && (
-                      <div className="card-tags">
+                      <div className="card-tags-narrative">
                         {item.tags.map((tag, tagIndex) => (
-                          <span key={tagIndex} className="tag">
+                          <span key={tagIndex} className="tag-narrative">
                             #{tag}
                           </span>
                         ))}
                       </div>
                     )}
 
-                    {item.notes && (
-                      <div className="card-notes">
-                        <strong>Notes:</strong> {item.notes}
-                      </div>
-                    )}
-
                     {isMilestone && (
-                      <div className="milestone-badge">
-                        <span className="milestone-icon">🏆</span>
-                        <span>Milestone Achievement</span>
+                      <div className="milestone-ribbon">
+                        <span className="ribbon-icon">🏆</span>
+                        <span className="ribbon-text">Milestone</span>
                       </div>
                     )}
                   </div>

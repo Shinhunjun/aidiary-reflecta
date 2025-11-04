@@ -98,12 +98,35 @@ export const AuthProvider = ({ children }) => {
     apiService.logout();
   };
 
+  const loginAsDemo = async () => {
+    try {
+      const response = await apiService.login({
+        email: "demo@reflecta.com",
+        password: "demo123",
+      });
+      console.log("AuthContext - demo login response:", response);
+      const userData = {
+        id: response.user.id,
+        email: response.user.email,
+        name: response.user.name,
+        role: response.user.role || "student",
+      };
+      setUser(userData);
+      localStorage.setItem("currentUser", JSON.stringify(userData));
+      return { success: true, user: userData };
+    } catch (error) {
+      console.error("Demo login error:", error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const value = {
     user,
     login,
     register,
     registerCounselor,
     logout,
+    loginAsDemo,
     loading,
     isAuthenticated: !!user,
   };

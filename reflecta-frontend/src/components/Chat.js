@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useJournal } from "../contexts/JournalContext";
 import apiService from "../services/api";
+import PersonaSelector from "./PersonaSelector";
 import "./Chat.css";
 
 const Chat = () => {
@@ -26,6 +27,9 @@ const Chat = () => {
   const [goalMapping, setGoalMapping] = useState(null);
   const [isConvertingToDiary, setIsConvertingToDiary] = useState(false);
   const [isLoadingChat, setIsLoadingChat] = useState(true);
+  const [showPersonaSelector, setShowPersonaSelector] = useState(false);
+  const [selectedPersonaId, setSelectedPersonaId] = useState(null);
+  const [currentPersona, setCurrentPersona] = useState(null);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
@@ -263,10 +267,15 @@ const Chat = () => {
 
         setMessages((prev) => [...prev, botMessage]);
       } else {
-        // Delegate to backend-enhanced chat endpoint
-        const response = await apiService.sendEnhancedMessage(inputMessage);
+        // Delegate to backend-enhanced chat endpoint with selected persona
+        const response = await apiService.sendEnhancedMessage(inputMessage, selectedPersonaId);
         const botResponse = response?.message ||
           "I'm here to reflect with you. Could you share a bit more?";
+
+        // Update current persona info if returned
+        if (response?.persona) {
+          setCurrentPersona(response.persona);
+        }
 
         const botMessage = {
           id: Date.now() + 1,
@@ -309,6 +318,11 @@ const Chat = () => {
     }
   };
 
+  const handlePersonaSelect = (personaId) => {
+    setSelectedPersonaId(personaId);
+    setShowPersonaSelector(false);
+  };
+
   const formatTime = (timestamp) => {
     // Ensure timestamp is a Date object
     const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
@@ -326,6 +340,13 @@ const Chat = () => {
         <div className="chat-controls">
           {!isSelectMode ? (
             <>
+              <button
+                className="control-button persona-button"
+                onClick={() => setShowPersonaSelector(true)}
+                title="Choose AI Persona"
+              >
+                {currentPersona ? currentPersona.icon : "💜"} Persona
+              </button>
               <button
                 className="control-button select-button"
                 onClick={() => setIsSelectMode(true)}
@@ -512,6 +533,14 @@ const Chat = () => {
           </div>
         </div>
       )}
+
+      {/* Persona Selector Modal */}
+      <PersonaSelector
+        isOpen={showPersonaSelector}
+        onClose={() => setShowPersonaSelector(false)}
+        currentPersonaId={selectedPersonaId}
+        onSelectPersona={handlePersonaSelect}
+      />
     </div>
   );
 };

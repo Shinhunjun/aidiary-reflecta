@@ -16,6 +16,7 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
 import Home from "./components/Home";
+import DemoLanding from "./components/DemoLanding";
 import Journal from "./components/Journal";
 import GoalSetting from "./components/GoalSetting";
 import ProgressTracking from "./components/ProgressTracking";
@@ -144,6 +145,14 @@ const MainContent = () => {
                 <PublicRoute>
                   <Signup />
                 </PublicRoute>
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/demo"
+            element={
+              <AnimatedRoute>
+                <DemoLanding />
               </AnimatedRoute>
             }
           />

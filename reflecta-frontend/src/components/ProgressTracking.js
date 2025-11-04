@@ -7,6 +7,8 @@ import ProgressCalendar from "./ProgressCalendar";
 import CompletionRings from "./CompletionRings";
 import MilestoneTimeline from "./MilestoneTimeline";
 import GoalSummaryModal from "./GoalSummaryModal";
+import EmotionalJourneyMap from "./EmotionalJourneyMap";
+import ReflectionWordCloud from "./ReflectionWordCloud";
 import "./ProgressTracking.css";
 
 const PERIOD_OPTIONS = [
@@ -380,6 +382,15 @@ const ProgressTracking = () => {
             mandalartData={goalPackages.find(pkg => pkg.mandalartData?.id === selectedGoalId)?.mandalartData}
             apiService={apiService}
           />
+        </section>
+
+        {/* NEW: Subjective Progress Visualizations */}
+        <section className="analytics-section">
+          <EmotionalJourneyMap goalId={selectedGoalId} />
+        </section>
+
+        <section className="analytics-section">
+          <ReflectionWordCloud goalId={selectedGoalId} />
         </section>
 
         <section className="analytics-section">

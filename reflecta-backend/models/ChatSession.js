@@ -21,6 +21,11 @@ const chatSessionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    selectedPersonaId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Persona",
+      default: null, // null means using default persona
+    },
     messages: [messageSchema],
   },
   {

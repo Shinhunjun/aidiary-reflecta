@@ -135,10 +135,10 @@ class ApiService {
     });
   }
 
-  async sendEnhancedMessage(message) {
+  async sendEnhancedMessage(message, personaId = null) {
     return this.request("/chat/enhanced", {
       method: "POST",
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, personaId }),
     });
   }
 
@@ -172,6 +172,14 @@ class ApiService {
 
   async getGoalProgressInsights(goalId) {
     return this.request(`/goals/${goalId}/progress/insights`);
+  }
+
+  async getGoalEmotionalJourney(goalId) {
+    return this.request(`/goals/${goalId}/emotional-journey`);
+  }
+
+  async getGoalNarrativeTimeline(goalId) {
+    return this.request(`/goals/${goalId}/narrative-timeline`);
   }
 
   // Goal Related Journal methods
@@ -262,6 +270,35 @@ class ApiService {
   async analyzeMoodPatterns() {
     return this.request("/analyze-mood-patterns", {
       method: "POST",
+    });
+  }
+
+  // Persona methods
+  async getPersonas() {
+    return this.request("/personas");
+  }
+
+  async getPersona(personaId) {
+    return this.request(`/personas/${personaId}`);
+  }
+
+  async createPersona(personaData) {
+    return this.request("/personas", {
+      method: "POST",
+      body: JSON.stringify(personaData),
+    });
+  }
+
+  async updatePersona(personaId, personaData) {
+    return this.request(`/personas/${personaId}`, {
+      method: "PUT",
+      body: JSON.stringify(personaData),
+    });
+  }
+
+  async deletePersona(personaId) {
+    return this.request(`/personas/${personaId}`, {
+      method: "DELETE",
     });
   }
 }
