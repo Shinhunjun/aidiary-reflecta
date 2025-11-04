@@ -188,17 +188,20 @@ const PageTour = ({
       <div className="tour-backdrop" onClick={handleSkip} />
 
       {/* Highlight overlay for specific element */}
-      {highlightedElement && (
-        <div
-          className="tour-highlight"
-          style={{
-            top: `${highlightedElement.getBoundingClientRect().top + window.scrollY}px`,
-            left: `${highlightedElement.getBoundingClientRect().left + window.scrollX}px`,
-            width: `${highlightedElement.offsetWidth}px`,
-            height: `${highlightedElement.offsetHeight}px`,
-          }}
-        />
-      )}
+      {highlightedElement && (() => {
+        const rect = highlightedElement.getBoundingClientRect();
+        return (
+          <div
+            className="tour-highlight"
+            style={{
+              top: `${rect.top}px`,
+              left: `${rect.left}px`,
+              width: `${rect.width}px`,
+              height: `${rect.height}px`,
+            }}
+          />
+        );
+      })()}
 
       {/* Tooltip */}
       <AnimatePresence mode="wait">
