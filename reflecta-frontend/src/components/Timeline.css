@@ -82,3 +82,76 @@
   font-weight: 500;
   margin-top: 10px;
 }
+
+/* Mobile Optimization - Single Column Timeline */
+@media (max-width: 768px) {
+  .timeline::after {
+    left: 20px;
+    transform: none;
+  }
+
+  .timeline-item {
+    width: 100%;
+    padding-left: 50px;
+    padding-right: 0;
+    align-self: flex-start !important;
+    justify-content: flex-start !important;
+  }
+
+  .timeline-item:nth-child(odd) {
+    padding-left: 50px;
+    padding-right: 0;
+  }
+
+  .timeline-content {
+    max-width: 100%;
+  }
+
+  .timeline-content::before {
+    left: -38px !important;
+    right: auto !important;
+  }
+
+  .timeline-item:nth-child(odd) .timeline-content::before {
+    left: -38px;
+    right: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .timeline-container {
+    margin-top: 20px;
+  }
+
+  .timeline::after {
+    left: 16px;
+  }
+
+  .timeline-item {
+    padding-left: 40px;
+    margin: 8px 0;
+  }
+
+  .timeline-item:nth-child(odd) {
+    padding-left: 40px;
+  }
+
+  .timeline-content {
+    padding: 16px;
+  }
+
+  .timeline-content::before {
+    left: -32px !important;
+    height: 14px;
+    width: 14px;
+  }
+
+  .timeline-date {
+    font-size: 11px;
+  }
+
+  .timeline-category {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}

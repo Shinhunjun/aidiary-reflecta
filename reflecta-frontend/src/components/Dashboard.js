@@ -12,6 +12,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [goals, setGoals] = useState(null);
+  const [goalId, setGoalId] = useState(null); // Store the Goal document _id
   const [journalStats, setJournalStats] = useState({ total: 0, thisWeek: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
@@ -35,8 +36,10 @@ const Dashboard = () => {
         const goalsResponse = await apiService.getGoals();
         if (Array.isArray(goalsResponse) && goalsResponse.length > 0) {
           setGoals(goalsResponse[0].mandalartData);
+          setGoalId(goalsResponse[0]._id); // Store the Goal document _id
         } else if (goalsResponse && goalsResponse.mandalartData) {
           setGoals(goalsResponse.mandalartData);
+          setGoalId(goalsResponse._id); // Store the Goal document _id
         }
 
         // Load journal entries
@@ -265,7 +268,7 @@ const Dashboard = () => {
           </div>
 
           {/* Progress Visualizations - Show for main goal */}
-          {goals && goals.id && (
+          {goals && goalId && (
             <>
               <div className="dashboard-section">
                 <h2>📊 Progress at a Glance</h2>
@@ -273,7 +276,7 @@ const Dashboard = () => {
                   Overview of your main goal's progress
                 </p>
                 <CompletionRings
-                  goalId={goals.id}
+                  goalId={goalId}
                   mandalartData={goals}
                   apiService={apiService}
                 />
@@ -281,12 +284,12 @@ const Dashboard = () => {
 
               <div className="dashboard-section">
                 <h2>💭 Your Emotional Journey</h2>
-                <EmotionalJourneyMap goalId={goals.id} />
+                <EmotionalJourneyMap goalId={goalId} />
               </div>
 
               <div className="dashboard-section">
                 <h2>☁️ Words of Reflection</h2>
-                <ReflectionWordCloud goalId={goals.id} />
+                <ReflectionWordCloud goalId={goalId} />
               </div>
             </>
           )}

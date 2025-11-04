@@ -6,12 +6,17 @@ import "./Sidebar.css";
 
 const Sidebar = () => {
   const { isAuthenticated, user, logout } = useAuth();
-  const { isCollapsed, toggleSidebar } = useSidebar();
+  const { isCollapsed, toggleSidebar, isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } = useSidebar();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+    closeMobileMenu();
+  };
+
+  const handleNavLinkClick = () => {
+    closeMobileMenu();
   };
 
   const sidebarVariants = {
@@ -43,12 +48,39 @@ const Sidebar = () => {
   };
 
   return (
-    <motion.aside
-      className={`sidebar ${isCollapsed ? "collapsed" : ""}`}
-      initial={false}
-      animate={isCollapsed ? "collapsed" : "expanded"}
-      variants={sidebarVariants}
-    >
+    <>
+      {/* Mobile Hamburger Button */}
+      <motion.button
+        className="mobile-hamburger"
+        onClick={toggleMobileMenu}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        aria-label="Toggle menu"
+      >
+        ☰
+      </motion.button>
+
+      {/* Mobile Backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            className="mobile-backdrop"
+            onClick={closeMobileMenu}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <motion.aside
+        className={`sidebar ${isCollapsed ? "collapsed" : ""} ${isMobileMenuOpen ? "mobile-open" : ""}`}
+        initial={false}
+        animate={isCollapsed ? "collapsed" : "expanded"}
+        variants={sidebarVariants}
+      >
       <motion.button
         className="toggle-btn"
         onClick={toggleSidebar}
@@ -57,6 +89,18 @@ const Sidebar = () => {
       >
         {isCollapsed ? "▶" : "◀"}
       </motion.button>
+
+      {/* Mobile Close Button */}
+      <motion.button
+        className="mobile-close-btn"
+        onClick={closeMobileMenu}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        aria-label="Close menu"
+      >
+        ✕
+      </motion.button>
+
       <div className="sidebar-header">
         <motion.h1
           className="sidebar-logo"
@@ -90,7 +134,8 @@ const Sidebar = () => {
           },
         }}
       >
-        <motion.div variants={linkVariants} whileHover="hover">
+        {/* About page hidden for now */}
+        {/* <motion.div variants={linkVariants} whileHover="hover">
           <NavLink
             to="/"
             className={({ isActive }) =>
@@ -100,7 +145,7 @@ const Sidebar = () => {
             <span className="sidebar-icon">ℹ️</span>
             <span className="sidebar-label">About</span>
           </NavLink>
-        </motion.div>
+        </motion.div> */}
 
         <motion.div variants={linkVariants} whileHover="hover">
           <NavLink
@@ -108,9 +153,10 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `sidebar-link ${isActive ? "active" : ""}`
             }
+            onClick={handleNavLinkClick}
           >
-            <span className="sidebar-icon">🎬</span>
-            <span className="sidebar-label">Demo</span>
+            <span className="sidebar-icon">🏠</span>
+            <span className="sidebar-label">Home</span>
           </NavLink>
         </motion.div>
 
@@ -122,6 +168,7 @@ const Sidebar = () => {
                 className={({ isActive }) =>
                   `sidebar-link ${isActive ? "active" : ""}`
                 }
+                onClick={handleNavLinkClick}
               >
                 <span className="sidebar-icon">🎯</span>
                 <span className="sidebar-label">Goal</span>
@@ -134,6 +181,7 @@ const Sidebar = () => {
                 className={({ isActive }) =>
                   `sidebar-link ${isActive ? "active" : ""}`
                 }
+                onClick={handleNavLinkClick}
               >
                 <span className="sidebar-icon">📊</span>
                 <span className="sidebar-label">Dashboard</span>
@@ -146,6 +194,7 @@ const Sidebar = () => {
                 className={({ isActive }) =>
                   `sidebar-link ${isActive ? "active" : ""}`
                 }
+                onClick={handleNavLinkClick}
               >
                 <span className="sidebar-icon">📝</span>
                 <span className="sidebar-label">Journal</span>
@@ -158,6 +207,7 @@ const Sidebar = () => {
                 className={({ isActive }) =>
                   `sidebar-link ${isActive ? "active" : ""}`
                 }
+                onClick={handleNavLinkClick}
               >
                 <span className="sidebar-icon">🔒</span>
                 <span className="sidebar-label">Privacy</span>
@@ -171,6 +221,7 @@ const Sidebar = () => {
                   className={({ isActive }) =>
                     `sidebar-link ${isActive ? "active" : ""}`
                   }
+                  onClick={handleNavLinkClick}
                 >
                   <span className="sidebar-icon">👥</span>
                   <span className="sidebar-label">Counselor</span>
@@ -182,7 +233,10 @@ const Sidebar = () => {
           <>
             <motion.div
               className="sidebar-link locked"
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                navigate("/login");
+                closeMobileMenu();
+              }}
               variants={linkVariants}
               whileHover={{ scale: 1.02, x: 5 }}
               whileTap={{ scale: 0.98 }}
@@ -194,7 +248,10 @@ const Sidebar = () => {
 
             <motion.div
               className="sidebar-link locked"
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                navigate("/login");
+                closeMobileMenu();
+              }}
               variants={linkVariants}
               whileHover={{ scale: 1.02, x: 5 }}
               whileTap={{ scale: 0.98 }}
@@ -206,7 +263,10 @@ const Sidebar = () => {
 
             <motion.div
               className="sidebar-link locked"
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                navigate("/login");
+                closeMobileMenu();
+              }}
               variants={linkVariants}
               whileHover={{ scale: 1.02, x: 5 }}
               whileTap={{ scale: 0.98 }}
@@ -275,7 +335,10 @@ const Sidebar = () => {
         ) : (
           <div className="auth-buttons">
             <motion.button
-              onClick={() => navigate("/login")}
+              onClick={() => {
+                navigate("/login");
+                closeMobileMenu();
+              }}
               className="login-btn"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -284,7 +347,10 @@ const Sidebar = () => {
               {isCollapsed ? "🔑" : "Login"}
             </motion.button>
             <motion.button
-              onClick={() => navigate("/signup")}
+              onClick={() => {
+                navigate("/signup");
+                closeMobileMenu();
+              }}
               className="signup-btn"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -296,6 +362,7 @@ const Sidebar = () => {
         )}
       </motion.div>
     </motion.aside>
+    </>
   );
 };
 

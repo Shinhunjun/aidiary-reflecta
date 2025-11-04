@@ -2996,38 +2996,101 @@ div.mandalart-sub-cell.mandalart-sub-connected.mandalart-sub-color-8 {
     padding: 10px;
   }
 
+  /* Mobile-optimized Mandalart grid - Option A: Center cell + scrollable list */
   .mandalart-grid {
-    max-width: 360px;
-    gap: 6px;
-    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 100%;
+    padding: 12px;
+    aspect-ratio: unset; /* Remove square aspect ratio on mobile */
   }
 
+  /* Center cell takes prominence on mobile */
+  .mandalart-grid > .mandalart-cell:nth-child(5),
+  .mandalart-grid > .mandalart-main-cell:nth-child(5),
+  .mandalart-grid > .mandalart-main-goal:nth-child(5) {
+    order: -1; /* Move center cell to top */
+    min-height: 160px;
+    padding: 20px;
+    font-size: 18px;
+    margin-bottom: 8px;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+  }
+
+  /* Surrounding 8 cells displayed as cards in scrollable list */
+  .mandalart-grid > .mandalart-cell,
+  .mandalart-grid > .mandalart-main-cell,
+  .mandalart-grid > .mandalart-main-goal {
+    min-height: 88px; /* Minimum 44px touch target + padding */
+    padding: 16px;
+    font-size: 15px;
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  /* Hide decorative grid background effects on mobile */
+  .mandalart-grid::before,
+  .mandalart-grid::after {
+    display: none;
+  }
+
+  /* 9x9 grid also uses mobile-friendly layout */
   .mandalart-9x9-grid {
-    max-width: 95vw;
-    gap: 6px;
-    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 100%;
+    padding: 12px;
+    aspect-ratio: unset;
+  }
+
+  .mandalart-9x9-grid > .mandalart-main-cell {
+    min-height: 120px;
+    padding: 16px;
+  }
+
+  /* Center main cell in 9x9 grid */
+  .mandalart-9x9-grid > .mandalart-main-cell:nth-child(5) {
+    order: -1;
+    min-height: 140px;
+    padding: 20px;
+    margin-bottom: 8px;
+  }
+
+  /* Sub-grid within each main cell remains 3x3 but smaller */
+  .mandalart-sub-grid {
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .mandalart-sub-center,
+  .mandalart-sub-cell {
+    min-height: 32px;
+    font-size: 10px;
+    padding: 4px;
   }
 
   .mandalart-cell {
     min-height: 100px;
-    padding: 10px;
+    padding: 12px;
   }
 
   .mandalart-cell-text {
-    font-size: 11px;
-    line-height: 1.3;
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   .mandalart-cell-description {
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .goal-description {
-    font-size: 0.7em;
+    font-size: 0.75em;
   }
 
   .goal-due-date {
-    font-size: 0.65em;
+    font-size: 0.7em;
   }
 
   .zoom-out-btn {
@@ -3037,6 +3100,63 @@ div.mandalart-sub-cell.mandalart-sub-connected.mandalart-sub-color-8 {
 
   .mandalart-controls {
     margin-bottom: 20px;
+  }
+
+  /* Ensure arrows/indicators are properly sized on mobile */
+  .mandalart-main-cell.has-goal::after {
+    font-size: 14px;
+  }
+
+  /* Make action buttons touch-friendly */
+  .mandalart-cell .delete-btn,
+  .mandalart-cell .zoom-in-btn {
+    padding: 8px;
+    font-size: 1.4em;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mandalart-cell-action-btn {
+    min-height: 36px;
+    min-width: 36px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  /* Stack sidebar below main content on mobile */
+  .mandalart-container {
+    flex-direction: column;
+  }
+
+  .mandalart-sidebar {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .mandalart-sidebar-card {
+    width: 100%;
+  }
+
+  /* Ensure grid surface doesn't have excessive padding on mobile */
+  .mandalart-grid-surface {
+    padding: 16px;
+  }
+
+  /* Optimize panel spacing */
+  .mandalart-grid-panel {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .mandalart-grid-toolbar h3 {
+    font-size: 20px;
+  }
+
+  .mandalart-grid-toolbar p {
+    font-size: 13px;
   }
 }
 
@@ -3057,33 +3177,69 @@ div.mandalart-sub-cell.mandalart-sub-connected.mandalart-sub-color-8 {
     font-size: 18px;
   }
 
+  /* Further optimize for very small screens (320-480px) */
   .mandalart-grid {
-    max-width: 95vw;
-    gap: 4px;
-    padding: 4px;
+    gap: 12px;
+    padding: 8px;
+  }
+
+  /* Center cell slightly smaller on very small screens */
+  .mandalart-grid > .mandalart-cell:nth-child(5),
+  .mandalart-grid > .mandalart-main-cell:nth-child(5),
+  .mandalart-grid > .mandalart-main-goal:nth-child(5) {
+    min-height: 140px;
+    padding: 16px;
+    font-size: 16px;
+  }
+
+  /* Other cells more compact */
+  .mandalart-grid > .mandalart-cell,
+  .mandalart-grid > .mandalart-main-cell,
+  .mandalart-grid > .mandalart-main-goal {
+    min-height: 72px;
+    padding: 12px;
+    font-size: 14px;
   }
 
   .mandalart-9x9-grid {
-    gap: 4px;
-    padding: 4px;
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .mandalart-9x9-grid > .mandalart-main-cell {
+    min-height: 100px;
+    padding: 12px;
+  }
+
+  .mandalart-9x9-grid > .mandalart-main-cell:nth-child(5) {
+    min-height: 120px;
+    padding: 16px;
   }
 
   .mandalart-cell {
     min-height: 80px;
-    padding: 8px;
+    padding: 10px;
   }
 
   .mandalart-cell-text {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .mandalart-cell-description {
-    font-size: 8px;
+    font-size: 10px;
   }
 
   .zoom-out-btn {
     padding: 6px 12px;
     font-size: 11px;
+  }
+
+  /* Ensure sub-grids remain readable */
+  .mandalart-sub-center,
+  .mandalart-sub-cell {
+    min-height: 28px;
+    font-size: 9px;
+    padding: 3px;
   }
 }
 

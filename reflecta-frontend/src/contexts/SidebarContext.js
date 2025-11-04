@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const SidebarContext = createContext();
 
@@ -12,6 +12,7 @@ export const useSidebar = () => {
 
 export const SidebarProvider = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -25,8 +26,38 @@ export const SidebarProvider = ({ children }) => {
     setIsCollapsed(false);
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  // Close mobile menu when window is resized to desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar, collapseSidebar, expandSidebar }}>
+    <SidebarContext.Provider
+      value={{
+        isCollapsed,
+        toggleSidebar,
+        collapseSidebar,
+        expandSidebar,
+        isMobileMenuOpen,
+        toggleMobileMenu,
+        closeMobileMenu,
+      }}
+    >
       {children}
     </SidebarContext.Provider>
   );
