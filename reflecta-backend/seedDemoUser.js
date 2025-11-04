@@ -6,6 +6,7 @@ const User = require("./models/User");
 const Goal = require("./models/Goal");
 const GoalProgress = require("./models/GoalProgress");
 const JournalEntry = require("./models/JournalEntry");
+const Persona = require("./models/Persona");
 
 // Connect to MongoDB
 const connectDB = async () => {
@@ -450,6 +451,40 @@ const createDemoProgressEntries = async (userId, goalId) => {
   }
 };
 
+// Copy default personas to user
+const copyPersonasToUser = async (userId) => {
+  // Check if user already has personas
+  const existingPersonas = await Persona.find({ userId: userId });
+  if (existingPersonas.length > 0) {
+    console.log(`✅ ${existingPersonas.length} personas already exist for this user`);
+    return;
+  }
+
+  // Find all default personas
+  const defaultPersonas = await Persona.find({ isDefault: true });
+  console.log(`📋 Copying ${defaultPersonas.length} default personas to user...`);
+
+  // Copy each default persona to the user
+  for (const defaultPersona of defaultPersonas) {
+    const personalizedPersona = new Persona({
+      userId: userId,
+      name: `${defaultPersona.name}-user-${userId}`,
+      displayName: defaultPersona.displayName,
+      description: defaultPersona.description,
+      systemPrompt: defaultPersona.systemPrompt,
+      category: defaultPersona.category,
+      color: defaultPersona.color,
+      icon: defaultPersona.icon,
+      avatarUrl: defaultPersona.avatarUrl,
+      isDefault: false,
+    });
+
+    await personalizedPersona.save();
+  }
+
+  console.log(`✅ ${defaultPersonas.length} personas copied successfully`);
+};
+
 // Main seed function for demo user
 const seedDemoUser = async () => {
   try {
@@ -461,6 +496,7 @@ const seedDemoUser = async () => {
     const goal = await createDemoGoals(user._id);
     await createDemoJournalEntries(user._id, goal.mandalartData.id);
     await createDemoProgressEntries(user._id, goal.mandalartData.id);
+    await copyPersonasToUser(user._id);
 
     console.log("\n✅ Demo user seeding completed successfully!");
     console.log("\n📝 Demo Account Credentials:");
@@ -471,7 +507,7 @@ const seedDemoUser = async () => {
     console.log("   - 1 Mandalart goal with 9 sub-goals (72 tasks total)");
     console.log("   - 15 diverse journal entries");
     console.log("   - 40 progress tracking entries");
-    console.log("   - 6 default AI personas (created separately)\n");
+    console.log("   - 6 AI personas (personalized copies)\n");
 
     process.exit(0);
   } catch (error) {
