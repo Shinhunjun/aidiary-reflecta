@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git Commit Guidelines
+
+**IMPORTANT**: When creating git commits:
+- DO NOT mention "Claude", "Claude Code", or any AI tool names in commit messages
+- DO NOT add "Generated with Claude Code" or "Co-Authored-By: Claude" attribution
+- Keep commit messages professional and focused on the technical changes
+- Use conventional commit format: type + brief description + detailed body
+
 ## Project Overview
 
 Reflecta is an AI-powered personal reflection journal application with three distinct user roles (student, counselor, admin) that combines journaling, goal-setting using the Mandalart framework, and mental health risk detection. The application is split into a React frontend and Node.js/Express backend.

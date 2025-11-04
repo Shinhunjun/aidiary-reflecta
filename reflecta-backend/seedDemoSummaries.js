@@ -248,6 +248,67 @@ Keep the summary concise (3-4 paragraphs), supportive, and insightful.`
         console.log('   Generating individual AI summaries for each sub-goal...');
         const childSummariesWithAI = [];
 
+        // STEP 1: Calculate word frequencies for ALL sub-goals first (for comparative filtering)
+        const stopWords = new Set([
+          // Basic stop words
+          "that", "this", "with", "from", "have", "been", "were", "your",
+          "will", "would", "could", "should", "about", "there", "their",
+          "which", "when", "where", "what", "more", "some", "into", "just",
+          "only", "very", "much", "than", "then", "also", "well", "back",
+          // Time-related words
+          "today", "yesterday", "tomorrow", "week", "month", "year", "time",
+          "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
+          "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+          // Common diary/journal words
+          "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
+          "make", "made", "making", "want", "wanted", "need", "needed",
+          "going", "went", "come", "came", "know", "knew", "thing", "things",
+          "really", "quite", "pretty", "still", "always", "never", "often",
+          // Pronouns and common verbs
+          "they", "them", "their", "theirs", "being", "having", "doing",
+          "getting", "giving", "taking", "looking", "trying", "working",
+        ]);
+
+        const wordFreqByGoal = {}; // Map: goalId -> { word -> count }
+        const wordToGoals = {}; // Map: word -> Set of goalIds that contain this word
+
+        // First pass: Calculate word frequencies for each sub-goal
+        for (const [id, data] of Object.entries(journalsByGoal)) {
+          if (data.entries.length === 0) continue;
+
+          const wordFreq = {};
+          data.entries.forEach(j => {
+            const words = `${j.title || ''} ${j.content || ''}`.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+            words.forEach(word => {
+              if (!stopWords.has(word)) {
+                wordFreq[word] = (wordFreq[word] || 0) + 1;
+              }
+            });
+          });
+
+          wordFreqByGoal[id] = wordFreq;
+
+          // Track which goals contain each word
+          Object.keys(wordFreq).forEach(word => {
+            if (!wordToGoals[word]) {
+              wordToGoals[word] = new Set();
+            }
+            wordToGoals[word].add(id);
+          });
+        }
+
+        // Identify common words (appear in 3+ sub-goals) - these will be filtered out
+        const commonWords = new Set();
+        Object.entries(wordToGoals).forEach(([word, goalSet]) => {
+          if (goalSet.size >= 3) {
+            commonWords.add(word);
+          }
+        });
+
+        console.log(`   Found ${commonWords.size} common words across sub-goals (will be filtered out)`);
+        console.log(`   Sample common words: ${Array.from(commonWords).slice(0, 10).join(', ')}`);
+
+        // STEP 2: Generate summaries and word clouds for each sub-goal
         for (const [id, data] of Object.entries(journalsByGoal)) {
           if (data.entries.length === 0) continue;
 
@@ -260,41 +321,16 @@ Keep the summary concise (3-4 paragraphs), supportive, and insightful.`
           const latestEntry = entries[0];
           const oldestEntry = entries[entries.length - 1];
 
-          // Generate word cloud for this sub-goal
-          const stopWords = new Set([
-            // Basic stop words
-            "that", "this", "with", "from", "have", "been", "were", "your",
-            "will", "would", "could", "should", "about", "there", "their",
-            "which", "when", "where", "what", "more", "some", "into", "just",
-            "only", "very", "much", "than", "then", "also", "well", "back",
-            // Time-related words
-            "today", "yesterday", "tomorrow", "week", "month", "year", "time",
-            "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
-            "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
-            // Common diary/journal words
-            "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
-            "make", "made", "making", "want", "wanted", "need", "needed",
-            "going", "went", "come", "came", "know", "knew", "thing", "things",
-            "really", "quite", "pretty", "still", "always", "never", "often",
-            // Pronouns and common verbs
-            "they", "them", "their", "theirs", "being", "having", "doing",
-            "getting", "giving", "taking", "looking", "trying", "working",
-          ]);
-
-          const wordFreq = {};
-          entries.forEach(j => {
-            const words = `${j.title || ''} ${j.content || ''}`.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
-            words.forEach(word => {
-              if (!stopWords.has(word)) {
-                wordFreq[word] = (wordFreq[word] || 0) + 1;
-              }
-            });
-          });
-
-          const wordCloudData = Object.entries(wordFreq)
+          // Generate word cloud for this sub-goal (filter out common words)
+          const wordFreq = wordFreqByGoal[id];
+          const distinctiveWords = Object.entries(wordFreq)
+            .filter(([word, count]) => !commonWords.has(word)) // Filter out common words
             .sort((a, b) => b[1] - a[1])
-            .slice(0, 50)
-            .map(([text, value]) => ({ text, value }));
+            .slice(0, 50);
+
+          const wordCloudData = distinctiveWords.map(([text, value]) => ({ text, value }));
+
+          console.log(`   Sub-goal "${data.goalText}": ${distinctiveWords.length} distinctive words (filtered ${Object.keys(wordFreq).length - distinctiveWords.length} common words)`);
 
           // Generate individual AI summary for this sub-goal
           let individualSummary = null;

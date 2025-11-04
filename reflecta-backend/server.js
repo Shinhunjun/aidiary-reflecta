@@ -2002,6 +2002,66 @@ app.get("/api/goals/:goalId/children/summary", authenticateToken, async (req, re
     // Create summary for each child goal with individual AI summaries
     const childSummariesWithAI = [];
 
+    // STEP 1: Calculate word frequencies for ALL sub-goals first (for comparative filtering)
+    const stopWords = new Set([
+      // Basic stop words
+      "that", "this", "with", "from", "have", "been", "were", "your",
+      "will", "would", "could", "should", "about", "there", "their",
+      "which", "when", "where", "what", "more", "some", "into", "just",
+      "only", "very", "much", "than", "then", "also", "well", "back",
+      // Time-related words
+      "today", "yesterday", "tomorrow", "week", "month", "year", "time",
+      "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
+      "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+      // Common diary/journal words
+      "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
+      "make", "made", "making", "want", "wanted", "need", "needed",
+      "going", "went", "come", "came", "know", "knew", "thing", "things",
+      "really", "quite", "pretty", "still", "always", "never", "often",
+      // Pronouns and common verbs
+      "they", "them", "their", "theirs", "being", "having", "doing",
+      "getting", "giving", "taking", "looking", "trying", "working",
+    ]);
+
+    const wordFreqByGoal = {}; // Map: goalId -> { word -> count }
+    const wordToGoals = {}; // Map: word -> Set of goalIds that contain this word
+
+    // First pass: Calculate word frequencies for each sub-goal
+    for (const [id, data] of Object.entries(journalsByGoal)) {
+      if (data.entries.length === 0) continue;
+
+      const wordFreq = {};
+      data.entries.forEach(j => {
+        const words = `${j.title || ''} ${j.content || ''}`.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+        words.forEach(word => {
+          if (!stopWords.has(word)) {
+            wordFreq[word] = (wordFreq[word] || 0) + 1;
+          }
+        });
+      });
+
+      wordFreqByGoal[id] = wordFreq;
+
+      // Track which goals contain each word
+      Object.keys(wordFreq).forEach(word => {
+        if (!wordToGoals[word]) {
+          wordToGoals[word] = new Set();
+        }
+        wordToGoals[word].add(id);
+      });
+    }
+
+    // Identify common words (appear in 3+ sub-goals) - these will be filtered out
+    const commonWords = new Set();
+    Object.entries(wordToGoals).forEach(([word, goalSet]) => {
+      if (goalSet.size >= 3) {
+        commonWords.add(word);
+      }
+    });
+
+    console.log(`Found ${commonWords.size} common words across sub-goals (will be filtered out)`);
+
+    // STEP 2: Generate summaries and word clouds for each sub-goal
     for (const [id, data] of Object.entries(journalsByGoal)) {
       if (data.entries.length === 0) continue;
 
@@ -2014,41 +2074,14 @@ app.get("/api/goals/:goalId/children/summary", authenticateToken, async (req, re
       const latestEntry = entries[0];
       const oldestEntry = entries[entries.length - 1];
 
-      // Generate word cloud for this sub-goal
-      const stopWords = new Set([
-        // Basic stop words
-        "that", "this", "with", "from", "have", "been", "were", "your",
-        "will", "would", "could", "should", "about", "there", "their",
-        "which", "when", "where", "what", "more", "some", "into", "just",
-        "only", "very", "much", "than", "then", "also", "well", "back",
-        // Time-related words
-        "today", "yesterday", "tomorrow", "week", "month", "year", "time",
-        "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
-        "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
-        // Common diary/journal words
-        "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
-        "make", "made", "making", "want", "wanted", "need", "needed",
-        "going", "went", "come", "came", "know", "knew", "thing", "things",
-        "really", "quite", "pretty", "still", "always", "never", "often",
-        // Pronouns and common verbs
-        "they", "them", "their", "theirs", "being", "having", "doing",
-        "getting", "giving", "taking", "looking", "trying", "working",
-      ]);
-
-      const wordFreq = {};
-      entries.forEach(j => {
-        const words = `${j.title || ''} ${j.content || ''}`.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
-        words.forEach(word => {
-          if (!stopWords.has(word)) {
-            wordFreq[word] = (wordFreq[word] || 0) + 1;
-          }
-        });
-      });
-
-      const wordCloudData = Object.entries(wordFreq)
+      // Generate word cloud for this sub-goal (filter out common words)
+      const wordFreq = wordFreqByGoal[id];
+      const distinctiveWords = Object.entries(wordFreq)
+        .filter(([word, count]) => !commonWords.has(word)) // Filter out common words
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 50)
-        .map(([text, value]) => ({ text, value }));
+        .slice(0, 50);
+
+      const wordCloudData = distinctiveWords.map(([text, value]) => ({ text, value }));
 
       // Generate individual AI summary for this sub-goal
       let individualSummary = null;
@@ -3270,11 +3303,27 @@ app.get(
         if (!entries || entries.length === 0) return [];
 
         const stopWords = new Set([
-          // Basic stop words
-          "that", "this", "with", "from", "have", "been", "were", "your",
-          "will", "would", "could", "should", "about", "there", "their",
-          "which", "when", "where", "what", "more", "some", "into", "just",
-          "only", "very", "much", "than", "then", "also", "well", "back",
+          // MOST basic stop words (MUST include these!)
+          "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
+          "of", "with", "by", "from", "as", "is", "was", "are", "were", "be",
+          "been", "being", "have", "has", "had", "do", "does", "did",
+          // Modal verbs and contractions
+          "will", "would", "should", "could", "may", "might", "can",
+          "this", "that", "these", "those",
+          // Pronouns
+          "i", "you", "he", "she", "it", "we", "they", "my", "your", "his",
+          "her", "its", "our", "their", "me", "him", "us", "them",
+          // Question words
+          "what", "which", "who", "when", "where", "why", "how",
+          // Contractions
+          "am", "im", "ive", "id", "ill", "dont", "didnt", "doesnt", "hasnt",
+          "havent", "hadnt", "wont", "wouldnt", "shouldnt", "couldnt", "cant",
+          "isnt", "arent", "wasnt", "werent",
+          // Common adverbs/adjectives
+          "just", "really", "very", "much", "more", "most", "some", "any",
+          "all", "each", "every", "other", "another", "such", "own", "same",
+          "so", "than", "too", "also", "well", "only", "like", "back",
+          "about", "into", "then",
           // Time-related words (often not meaningful in diary context)
           "today", "yesterday", "tomorrow", "week", "month", "year", "time",
           "date", "morning", "afternoon", "evening", "night", "daily", "weekly",
@@ -3283,10 +3332,11 @@ app.get(
           "feel", "felt", "feeling", "feelings", "think", "thought", "thinking",
           "make", "made", "making", "want", "wanted", "need", "needed",
           "going", "went", "come", "came", "know", "knew", "thing", "things",
-          "really", "quite", "pretty", "still", "always", "never", "often",
-          // Pronouns and common verbs
-          "they", "them", "their", "theirs", "being", "having", "doing",
-          "getting", "giving", "taking", "looking", "trying", "working",
+          "quite", "pretty", "still", "always", "never", "often",
+          // Common verbs
+          "doing", "getting", "giving", "taking", "looking", "trying", "working",
+          // Diary-specific
+          "dear", "diary", "yours", "truly", "user",
         ]);
 
         const allText = entries
