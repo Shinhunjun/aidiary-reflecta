@@ -19,7 +19,7 @@ import Home from "./components/Home";
 import DemoLanding from "./components/DemoLanding";
 import Journal from "./components/Journal";
 import GoalSetting from "./components/GoalSetting";
-import ProgressTracking from "./components/ProgressTracking";
+// import ProgressTracking from "./components/ProgressTracking"; // Removed - consolidated into Dashboard
 import PrivacySettings from "./components/PrivacySettings";
 import CounselorDashboard from "./components/CounselorDashboard";
 import Sidebar from "./components/Sidebar";
@@ -186,7 +186,8 @@ const MainContent = () => {
               </AnimatedRoute>
             }
           />
-          <Route
+          {/* Progress page removed - functionality consolidated into Dashboard */}
+          {/* <Route
             path="/progress"
             element={
               <AnimatedRoute>
@@ -195,7 +196,7 @@ const MainContent = () => {
                 </ProtectedRoute>
               </AnimatedRoute>
             }
-          />
+          /> */}
           <Route
             path="/privacy-settings"
             element={

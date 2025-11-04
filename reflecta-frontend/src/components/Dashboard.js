@@ -368,7 +368,7 @@ const Dashboard = () => {
               </div>
 
               <div className="dashboard-section">
-                <h2>☁️ Words of Reflection</h2>
+                <h2>☁️ Words of Your Journey</h2>
                 <ReflectionWordCloud goalId={goalId} />
               </div>
             </>
