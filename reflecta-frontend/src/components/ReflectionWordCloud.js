@@ -16,120 +16,24 @@ const ReflectionWordCloud = ({ goalId }) => {
   const fetchReflectionWords = async () => {
     try {
       setLoading(true);
-      const journalData = await apiService.getGoalJournals(goalId);
 
-      if (!journalData || journalData.length === 0) {
+      // Call backend API to get word cloud (with 7-day caching)
+      const wordCloudData = await apiService.getGoalWordCloud(goalId, timeRange);
+
+      if (!wordCloudData) {
         setWordData({ current: [], past: [] });
         setLoading(false);
         return;
       }
 
-      // Extract words from journal entries (title and content)
-      const extractWords = (entries) => {
-        const text = entries
-          .map((entry) => {
-            const title = entry.title || '';
-            const content = entry.content || '';
-            return `${title} ${content}`;
-          })
-          .join(' ');
-
-        // Simple word extraction and frequency counting
-        const words = text
-          .toLowerCase()
-          .replace(/[^a-z\s]/g, '')
-          .split(/\s+/)
-          .filter((word) => word.length > 3); // Filter short words
-
-        // Common stop words to exclude
-        const stopWords = new Set([
-          'that',
-          'this',
-          'with',
-          'from',
-          'have',
-          'been',
-          'were',
-          'your',
-          'will',
-          'would',
-          'could',
-          'should',
-          'about',
-          'there',
-          'their',
-          'which',
-          'when',
-          'where',
-          'what',
-          'more',
-          'some',
-          'into',
-          'just',
-          'only',
-          'very',
-          'much',
-          'than',
-        ]);
-
-        const wordFreq = {};
-        words.forEach((word) => {
-          if (!stopWords.has(word)) {
-            wordFreq[word] = (wordFreq[word] || 0) + 1;
-          }
-        });
-
-        // Convert to array and sort by frequency
-        return Object.entries(wordFreq)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 40) // Top 40 words
-          .map(([word, count]) => ({ word, count }));
-      };
-
-      if (timeRange === 'comparison') {
-        // Split data: last 3 months vs previous 3 months
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-        const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-        const recentEntries = journalData.filter(
-          (entry) => new Date(entry.createdAt || entry.date) >= threeMonthsAgo
-        );
-
-        const pastEntries = journalData.filter(
-          (entry) =>
-            new Date(entry.createdAt || entry.date) < threeMonthsAgo &&
-            new Date(entry.createdAt || entry.date) >= sixMonthsAgo
-        );
-
-        setWordData({
-          current: extractWords(recentEntries),
-          past: extractWords(pastEntries),
-        });
-      } else if (timeRange === 'recent') {
-        // Last 3 months only
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-
-        const recentEntries = journalData.filter(
-          (entry) => new Date(entry.createdAt || entry.date) >= threeMonthsAgo
-        );
-
-        setWordData({
-          current: extractWords(recentEntries),
-          past: [],
-        });
-      } else {
-        // All time
-        setWordData({
-          current: extractWords(journalData),
-          past: [],
-        });
-      }
+      // Backend returns { current: [...], past: [...] }
+      setWordData({
+        current: wordCloudData.current || [],
+        past: wordCloudData.past || [],
+      });
     } catch (error) {
       console.error('Failed to fetch reflection words:', error);
+      setWordData({ current: [], past: [] });
     } finally {
       setLoading(false);
     }

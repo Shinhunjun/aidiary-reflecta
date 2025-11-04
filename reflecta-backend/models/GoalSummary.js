@@ -14,7 +14,7 @@ const goalSummarySchema = new mongoose.Schema({
   },
   summaryType: {
     type: String,
-    enum: ["journal", "children"],
+    enum: ["journal", "children", "wordcloud"],
     required: true,
   },
   summary: {

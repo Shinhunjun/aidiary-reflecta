@@ -3076,111 +3076,150 @@ Format your response as JSON:
   }
 );
 
-// Word Cloud data endpoint
+// Word Cloud data endpoint with 7-day caching
 app.get(
   "/api/goals/:goalId/wordcloud",
   authenticateToken,
   async (req, res) => {
     try {
       const { goalId } = req.params;
-      const period = req.query.period || "weekly";
+      const userId = req.user.userId;
+      const timeRange = req.query.timeRange || "all"; // 'all', 'recent', 'comparison'
 
-      const { start, end } = getPeriodBounds(period);
+      // Check for cached word cloud (valid for 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      // Get progress entries and journal entries
-      const progressEntries = await GoalProgress.find({
-        userId: req.user.userId,
+      const cachedWordCloud = await GoalSummary.findOne({
+        userId,
         goalId,
-        date: { $gte: start, $lte: end },
+        summaryType: "wordcloud",
+        createdAt: { $gte: sevenDaysAgo },
+        "metadata.timeRange": timeRange,
+      }).sort({ createdAt: -1 });
+
+      if (cachedWordCloud && cachedWordCloud.metadata.wordCloudData) {
+        console.log(`Using cached word cloud for goal ${goalId}, timeRange: ${timeRange}`);
+
+        // Return cached data in the format expected by frontend
+        if (timeRange === 'comparison') {
+          return res.json({
+            current: cachedWordCloud.metadata.wordCloudData.current || [],
+            past: cachedWordCloud.metadata.wordCloudData.past || [],
+          });
+        } else {
+          return res.json({
+            current: cachedWordCloud.metadata.wordCloudData.current || [],
+            past: [],
+          });
+        }
+      }
+
+      // No cache - generate word cloud
+      console.log(`Generating new word cloud for goal ${goalId}, timeRange: ${timeRange}`);
+
+      // Helper function to extract words from journal entries
+      const extractWords = (entries) => {
+        if (!entries || entries.length === 0) return [];
+
+        const stopWords = new Set([
+          "that", "this", "with", "from", "have", "been", "were", "your",
+          "will", "would", "could", "should", "about", "there", "their",
+          "which", "when", "where", "what", "more", "some", "into", "just",
+          "only", "very", "much", "than",
+        ]);
+
+        const allText = entries
+          .map((entry) => `${entry.title || ""} ${entry.content || ""}`)
+          .join(" ")
+          .toLowerCase()
+          .replace(/[^a-z\s]/g, "")
+          .split(/\s+/)
+          .filter((word) => word.length > 3 && !stopWords.has(word));
+
+        const wordFreq = {};
+        allText.forEach((word) => {
+          wordFreq[word] = (wordFreq[word] || 0) + 1;
+        });
+
+        return Object.entries(wordFreq)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 40)
+          .map(([word, count]) => ({ word, count }));
+      };
+
+      // Fetch journal entries based on timeRange
+      let currentWords = [];
+      let pastWords = [];
+
+      if (timeRange === "comparison") {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+        const recentEntries = await JournalEntry.find({
+          userId,
+          relatedGoalId: goalId,
+          date: { $gte: threeMonthsAgo },
+        });
+
+        const pastEntries = await JournalEntry.find({
+          userId,
+          relatedGoalId: goalId,
+          date: { $gte: sixMonthsAgo, $lt: threeMonthsAgo },
+        });
+
+        currentWords = extractWords(recentEntries);
+        pastWords = extractWords(pastEntries);
+      } else if (timeRange === "recent") {
+        const threeMonthsAgo = new Date();
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+        const recentEntries = await JournalEntry.find({
+          userId,
+          relatedGoalId: goalId,
+          date: { $gte: threeMonthsAgo },
+        });
+
+        currentWords = extractWords(recentEntries);
+      } else {
+        // 'all' - all time
+        const allEntries = await JournalEntry.find({
+          userId,
+          relatedGoalId: goalId,
+        });
+
+        currentWords = extractWords(allEntries);
+      }
+
+      // Cache the word cloud for 7 days
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      await GoalSummary.create({
+        userId,
+        goalId,
+        summaryType: "wordcloud",
+        summary: `Word cloud for ${timeRange} timeRange`,
+        metadata: {
+          timeRange,
+          wordCloudData: {
+            current: currentWords,
+            past: pastWords,
+          },
+        },
+        expiresAt,
       });
 
-      const journalEntries = await JournalEntry.find({
-        userId: req.user.userId,
-        relatedGoalId: goalId,
-        date: { $gte: start, $lte: end },
-      });
+      console.log(`Cached word cloud for goal ${goalId}, timeRange: ${timeRange} (expires in 7 days)`);
 
-      // Combine all text
-      const allText =
-        progressEntries.map((p) => `${p.title} ${p.description}`).join(" ") +
-        " " +
-        journalEntries.map((j) => j.content).join(" ");
-
-      // Simple word frequency analysis (remove common words)
-      const stopWords = new Set([
-        "the",
-        "a",
-        "an",
-        "and",
-        "or",
-        "but",
-        "in",
-        "on",
-        "at",
-        "to",
-        "for",
-        "of",
-        "with",
-        "by",
-        "from",
-        "as",
-        "is",
-        "was",
-        "are",
-        "were",
-        "been",
-        "be",
-        "have",
-        "has",
-        "had",
-        "do",
-        "does",
-        "did",
-        "will",
-        "would",
-        "should",
-        "could",
-        "may",
-        "might",
-        "can",
-        "my",
-        "your",
-        "his",
-        "her",
-        "its",
-        "our",
-        "their",
-        "this",
-        "that",
-        "these",
-        "those",
-        "i",
-        "you",
-        "he",
-        "she",
-        "it",
-        "we",
-        "they",
-      ]);
-
-      const words = allText
-        .toLowerCase()
-        .replace(/[^\w\s]/g, "")
-        .split(/\s+/)
-        .filter((word) => word.length > 3 && !stopWords.has(word));
-
-      const wordFreq = {};
-      words.forEach((word) => {
-        wordFreq[word] = (wordFreq[word] || 0) + 1;
-      });
-
-      // Convert to array and sort
-      const wordCloudData = Object.entries(wordFreq)
-        .map(([text, value]) => ({ text, value }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 50); // Top 50 words
-
-      res.json({ words: wordCloudData });
+      // Return response
+      if (timeRange === 'comparison') {
+        res.json({ current: currentWords, past: pastWords });
+      } else {
+        res.json({ current: currentWords, past: [] });
+      }
     } catch (error) {
       console.error("Word cloud error:", error);
       res.status(500).json({ error: "Failed to generate word cloud" });

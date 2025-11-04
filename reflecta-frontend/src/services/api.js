@@ -187,6 +187,11 @@ class ApiService {
     return this.request(`/goals/${goalId}/journals`);
   }
 
+  async getGoalWordCloud(goalId, timeRange = 'all') {
+    const params = new URLSearchParams({ timeRange });
+    return this.request(`/goals/${goalId}/wordcloud?${params.toString()}`);
+  }
+
   async getGoalJournalSummary(goalId) {
     return this.request(`/goals/${goalId}/journals/summary`);
   }
