@@ -118,7 +118,7 @@
 .persona-delete-btn {
   position: absolute;
   top: 12px;
-  right: 12px;
+  left: 12px;
   background: rgba(239, 68, 68, 0.9);
   border: none;
   width: 32px;
@@ -132,6 +132,7 @@
   opacity: 0;
   transition: all 0.2s;
   z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .persona-card:hover .persona-delete-btn {
