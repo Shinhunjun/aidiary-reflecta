@@ -16,22 +16,21 @@ const ReflectionWordCloud = ({ goalId }) => {
   const fetchReflectionWords = async () => {
     try {
       setLoading(true);
-      const progressData = await apiService.getGoalProgress(goalId);
+      const journalData = await apiService.getGoalJournals(goalId);
 
-      if (!progressData || progressData.length === 0) {
+      if (!journalData || journalData.length === 0) {
         setWordData({ current: [], past: [] });
         setLoading(false);
         return;
       }
 
-      // Extract words from descriptions and notes
+      // Extract words from journal entries (title and content)
       const extractWords = (entries) => {
         const text = entries
           .map((entry) => {
-            const desc = entry.description || '';
-            const notes = entry.notes || '';
             const title = entry.title || '';
-            return `${title} ${desc} ${notes}`;
+            const content = entry.content || '';
+            return `${title} ${content}`;
           })
           .join(' ');
 
@@ -95,14 +94,14 @@ const ReflectionWordCloud = ({ goalId }) => {
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-        const recentEntries = progressData.filter(
-          (entry) => new Date(entry.date) >= threeMonthsAgo
+        const recentEntries = journalData.filter(
+          (entry) => new Date(entry.createdAt || entry.date) >= threeMonthsAgo
         );
 
-        const pastEntries = progressData.filter(
+        const pastEntries = journalData.filter(
           (entry) =>
-            new Date(entry.date) < threeMonthsAgo &&
-            new Date(entry.date) >= sixMonthsAgo
+            new Date(entry.createdAt || entry.date) < threeMonthsAgo &&
+            new Date(entry.createdAt || entry.date) >= sixMonthsAgo
         );
 
         setWordData({
@@ -114,8 +113,8 @@ const ReflectionWordCloud = ({ goalId }) => {
         const threeMonthsAgo = new Date();
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
-        const recentEntries = progressData.filter(
-          (entry) => new Date(entry.date) >= threeMonthsAgo
+        const recentEntries = journalData.filter(
+          (entry) => new Date(entry.createdAt || entry.date) >= threeMonthsAgo
         );
 
         setWordData({
@@ -125,7 +124,7 @@ const ReflectionWordCloud = ({ goalId }) => {
       } else {
         // All time
         setWordData({
-          current: extractWords(progressData),
+          current: extractWords(journalData),
           past: [],
         });
       }
