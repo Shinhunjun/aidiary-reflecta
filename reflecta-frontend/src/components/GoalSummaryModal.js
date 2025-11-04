@@ -7,6 +7,7 @@ const GoalSummaryModal = ({
   isOpen,
   onClose,
   goalText,
+  selectedGoalId,
   journalSummary,
   childrenSummary,
   journalEntries,
@@ -15,6 +16,11 @@ const GoalSummaryModal = ({
   loadingJournalEntries,
 }) => {
   if (!isOpen) return null;
+
+  // Filter childrenSummary to show only the selected sub-goal
+  const filteredChildrenSummaries = selectedGoalId && childrenSummary?.childGoalsSummaries
+    ? childrenSummary.childGoalsSummaries.filter(child => child.goalId === selectedGoalId)
+    : childrenSummary?.childGoalsSummaries || [];
 
   const getMoodEmoji = (mood) => {
     const moodEmojis = {
@@ -108,18 +114,18 @@ const GoalSummaryModal = ({
                       </div>
                     )}
 
-                    {/* Individual Child Goals */}
-                    {childrenSummary.childGoalsSummaries &&
-                      childrenSummary.childGoalsSummaries.length > 0 && (
+                    {/* Individual Child Goals - Show only selected sub-goal */}
+                    {filteredChildrenSummaries &&
+                      filteredChildrenSummaries.length > 0 && (
                         <div className="child-goals-grid">
-                          {childrenSummary.childGoalsSummaries.map(
+                          {filteredChildrenSummaries.map(
                             (child, index) => (
                               <div
                                 key={child.goalId || index}
                                 className="child-goal-card"
                                 style={{
                                   borderLeft: `4px solid ${getMoodColor(
-                                    child.dominantMood
+                                    child.dominantMood || child.latestMood
                                   )}`,
                                 }}
                               >
@@ -134,18 +140,18 @@ const GoalSummaryModal = ({
                                   {child.summary}
                                 </p>
 
-                                {child.dominantMood && (
+                                {(child.dominantMood || child.latestMood) && (
                                   <div className="mood-indicator">
                                     <span
                                       className="mood-dot"
                                       style={{
                                         backgroundColor: getMoodColor(
-                                          child.dominantMood
+                                          child.dominantMood || child.latestMood
                                         ),
                                       }}
                                     />
                                     <span className="mood-label">
-                                      Dominant mood: {child.dominantMood}
+                                      Latest mood: {child.dominantMood || child.latestMood}
                                     </span>
                                   </div>
                                 )}
@@ -155,10 +161,10 @@ const GoalSummaryModal = ({
                         </div>
                       )}
 
-                    {(!childrenSummary.childGoalsSummaries ||
-                      childrenSummary.childGoalsSummaries.length === 0) && (
+                    {(!filteredChildrenSummaries ||
+                      filteredChildrenSummaries.length === 0) && (
                       <div className="no-data-message">
-                        No sub-goal data available yet. Start journaling to see
+                        No data available for this sub-goal yet. Start journaling to see
                         progress insights!
                       </div>
                     )}

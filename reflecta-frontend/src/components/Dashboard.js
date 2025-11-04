@@ -383,6 +383,7 @@ const Dashboard = () => {
         isOpen={showSummaryModal}
         onClose={() => setShowSummaryModal(false)}
         goalText={selectedGoalText}
+        selectedGoalId={selectedGoalId}
         journalSummary={journalSummary}
         childrenSummary={childrenSummary}
         journalEntries={journalEntries}
