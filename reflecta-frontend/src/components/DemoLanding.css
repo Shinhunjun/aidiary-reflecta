@@ -554,6 +554,14 @@
 
 .demo-showcase-image {
   position: relative;
+  transition: transform 0.4s ease;
+  cursor: pointer;
+}
+
+/* Single screenshot hover effect - 1.5x scale */
+.demo-showcase-image:hover {
+  transform: scale(1.5);
+  z-index: 100;
 }
 
 /* Multi-screenshot Grid for Chat-to-Diary */
@@ -593,21 +601,11 @@
   cursor: pointer;
 }
 
-/* Hover effect - enlarge image to cover both grid cells */
+/* Hover effect - enlarge image in place (1.5x scale) */
 .demo-screenshot-wrapper:hover .demo-screenshot-placeholder {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 200%;
-  transform: scale(1.15);
+  transform: scale(1.5);
   z-index: 100;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
-}
-
-/* Second item hover should expand to the left */
-.demo-screenshot-wrapper:nth-child(2):hover .demo-screenshot-placeholder {
-  left: auto;
-  right: 0;
 }
 
 /* Brighten caption on hover */
