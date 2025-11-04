@@ -6,6 +6,8 @@ import GoalSummaryModal from "./GoalSummaryModal";
 import EmotionalJourneyMap from "./EmotionalJourneyMap";
 import ReflectionWordCloud from "./ReflectionWordCloud";
 import CompletionRings from "./CompletionRings";
+import PageTour from "./PageTour";
+import HelpButton from "./HelpButton";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -308,6 +310,54 @@ const Dashboard = () => {
         loadingChildrenSummary={loadingChildrenSummary}
         loadingJournalEntries={loadingJournalEntries}
       />
+
+      {/* Page Tour for Demo Users */}
+      <PageTour
+        page="dashboard"
+        steps={[
+          {
+            icon: "👋",
+            title: "Welcome to Your Dashboard!",
+            description: "This is your personal growth command center. Here you can see your overall progress, journal statistics, and get AI-powered insights into your reflection journey.",
+            selector: null, // Center of screen
+          },
+          {
+            icon: "📈",
+            title: "Journal Statistics",
+            description: "Track how many journal entries you've created this week and in total. Consistent reflection is key to personal growth!",
+            selector: ".stats-container",
+          },
+          {
+            icon: "🎯",
+            title: "Your Main Goal",
+            description: "This shows your primary goal from the Mandalart framework. Click on it to see detailed summaries and related journal entries.",
+            selector: ".main-goal-card",
+          },
+          {
+            icon: "📊",
+            title: "Progress Rings",
+            description: "Visual representation of your goal completion. The rings show progress for your main goal, sub-goals, and actionable tasks.",
+            selector: ".dashboard-section:has(.completion-rings-container)",
+          },
+          {
+            icon: "💭",
+            title: "Emotional Journey Map",
+            description: "See how your emotions evolve over time. This chart tracks your mood patterns and helps you understand your emotional trends.",
+            selector: ".dashboard-section:has(h2:contains('Emotional Journey'))",
+          },
+          {
+            icon: "☁️",
+            title: "Word Cloud",
+            description: "The most frequent words from your journal entries appear here. Larger words indicate themes you focus on most.",
+            selector: ".dashboard-section:has(h2:contains('Words of Reflection'))",
+          },
+        ]}
+      />
+
+      {/* Help Button - Always show for demo users */}
+      {user?.email === 'demo@reflecta.com' && (
+        <HelpButton page="dashboard" />
+      )}
     </div>
   );
 };

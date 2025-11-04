@@ -1,0 +1,84 @@
+/* Help Button - Floating bottom right */
+.help-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+  cursor: pointer;
+  z-index: 9997;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.help-button:hover {
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5);
+}
+
+.help-icon {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+/* Help Tooltip */
+.help-tooltip {
+  position: fixed;
+  bottom: 40px;
+  right: 100px;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  z-index: 9998;
+}
+
+.help-tooltip::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid rgba(99, 102, 241, 0.3);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .help-button {
+    width: 48px;
+    height: 48px;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .help-icon {
+    font-size: 24px;
+  }
+
+  .help-tooltip {
+    bottom: 80px;
+    right: 20px;
+    left: 20px;
+    text-align: center;
+  }
+
+  .help-tooltip::after {
+    display: none;
+  }
+}
