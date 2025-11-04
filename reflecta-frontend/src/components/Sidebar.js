@@ -49,16 +49,14 @@ const Sidebar = () => {
       animate={isCollapsed ? "collapsed" : "expanded"}
       variants={sidebarVariants}
     >
-      {isAuthenticated && (
-        <motion.button
-          className="toggle-btn"
-          onClick={toggleSidebar}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {isCollapsed ? "▶" : "◀"}
-        </motion.button>
-      )}
+      <motion.button
+        className="toggle-btn"
+        onClick={toggleSidebar}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        {isCollapsed ? "▶" : "◀"}
+      </motion.button>
       <div className="sidebar-header">
         <motion.h1
           className="sidebar-logo"
@@ -281,16 +279,18 @@ const Sidebar = () => {
               className="login-btn"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              title="Login"
             >
-              Login
+              {isCollapsed ? "🔑" : "Login"}
             </motion.button>
             <motion.button
               onClick={() => navigate("/signup")}
               className="signup-btn"
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
+              title="Sign Up"
             >
-              Sign Up
+              {isCollapsed ? "✨" : "Sign Up"}
             </motion.button>
           </div>
         )}
