@@ -603,8 +603,13 @@
 }
 
 /* Hover effect - enlarge entire grid when any screenshot is hovered */
-.demo-screenshots-grid:hover .demo-screenshot-wrapper {
-  transform: scale(1.5);
+.demo-screenshots-grid:hover .demo-screenshot-wrapper:first-child {
+  transform: scale(1.5) translateX(-10%);
+  z-index: 100;
+}
+
+.demo-screenshots-grid:hover .demo-screenshot-wrapper:last-child {
+  transform: scale(1.5) translateX(10%);
   z-index: 100;
 }
 
