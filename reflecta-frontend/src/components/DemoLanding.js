@@ -113,8 +113,18 @@ const DemoLanding = () => {
         "Mood tracking and emotion analysis",
         "Edit and refine AI-generated entries"
       ],
-      screenshot: "/screenshots/chat-to-diary.png",
-      imageAlt: "Chat to diary conversion process"
+      screenshots: [
+        {
+          url: "/screenshots/chat-interface.png",
+          alt: "AI chat conversation interface",
+          caption: "Step 1: Chat naturally with AI"
+        },
+        {
+          url: "/screenshots/diary-converted.png",
+          alt: "Converted diary entry with goal mapping",
+          caption: "Step 2: Instant diary conversion"
+        }
+      ]
     },
     {
       title: "Understand Your Growth Patterns",
@@ -274,21 +284,50 @@ const DemoLanding = () => {
               transition={{ duration: 0.7, delay: index * 0.2 }}
             >
               <div className="demo-showcase-image">
-                <div className="demo-screenshot-placeholder">
-                  <img
-                    src={feature.screenshot}
-                    alt={feature.imageAlt}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  <div className="demo-screenshot-fallback" style={{ display: 'none' }}>
-                    <span className="demo-screenshot-icon">📸</span>
-                    <p>Screenshot Coming Soon</p>
-                    <small>{feature.imageAlt}</small>
+                {feature.screenshots ? (
+                  // Multiple screenshots for this feature
+                  <div className="demo-screenshots-grid">
+                    {feature.screenshots.map((screenshot, sIndex) => (
+                      <div key={sIndex} className="demo-screenshot-wrapper">
+                        <div className="demo-screenshot-placeholder">
+                          <img
+                            src={screenshot.url}
+                            alt={screenshot.alt}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                          <div className="demo-screenshot-fallback" style={{ display: 'none' }}>
+                            <span className="demo-screenshot-icon">📸</span>
+                            <p>Screenshot Coming Soon</p>
+                            <small>{screenshot.alt}</small>
+                          </div>
+                        </div>
+                        {screenshot.caption && (
+                          <p className="demo-screenshot-caption">{screenshot.caption}</p>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  // Single screenshot
+                  <div className="demo-screenshot-placeholder">
+                    <img
+                      src={feature.screenshot}
+                      alt={feature.imageAlt}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    <div className="demo-screenshot-fallback" style={{ display: 'none' }}>
+                      <span className="demo-screenshot-icon">📸</span>
+                      <p>Screenshot Coming Soon</p>
+                      <small>{feature.imageAlt}</small>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="demo-showcase-content">

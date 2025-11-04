@@ -556,6 +556,29 @@
   position: relative;
 }
 
+/* Multi-screenshot Grid for Chat-to-Diary */
+.demo-screenshots-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.demo-screenshot-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.demo-screenshot-caption {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a78bfa;
+  margin: 0;
+  padding: 8px 0;
+}
+
 .demo-screenshot-placeholder {
   position: relative;
   width: 100%;
@@ -816,6 +839,16 @@
 
   .demo-showcase-highlights li {
     font-size: 14px;
+  }
+
+  /* Stack multi-screenshots vertically on mobile */
+  .demo-screenshots-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .demo-screenshot-caption {
+    font-size: 13px;
   }
 }
 
