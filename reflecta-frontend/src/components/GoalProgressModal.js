@@ -26,6 +26,8 @@ const GoalProgressModal = ({
   });
   const [isSaving, setIsSaving] = useState(false);
   const [progressHistory, setProgressHistory] = useState([]);
+  const [aiSummary, setAiSummary] = useState(null);
+  const [isLoadingSummary, setIsLoadingSummary] = useState(false);
 
   const resolvedGoalId = goal?.mandalartData?.id || goal?.id || null;
   const resolvedGoalText =
@@ -34,8 +36,11 @@ const GoalProgressModal = ({
   useEffect(() => {
     if (isOpen && resolvedGoalId) {
       loadProgressHistory();
+      if (subGoal) {
+        loadAISummary();
+      }
     }
-  }, [isOpen, resolvedGoalId]);
+  }, [isOpen, resolvedGoalId, subGoal]);
 
   const loadProgressHistory = async () => {
     if (!resolvedGoalId) return;
@@ -45,6 +50,28 @@ const GoalProgressModal = ({
       setProgressHistory(history);
     } catch (error) {
       console.error("Error loading progress history:", error);
+    }
+  };
+
+  const loadAISummary = async () => {
+    if (!goal?._id || !subGoal?.id) return;
+
+    setIsLoadingSummary(true);
+    try {
+      const summaryData = await apiService.getGoalChildrenSummary(goal._id);
+
+      if (summaryData && summaryData.childGoalsSummaries) {
+        // Find the summary for this specific sub-goal
+        const subGoalSummary = summaryData.childGoalsSummaries.find(
+          (s) => s.goalId === subGoal.id
+        );
+        setAiSummary(subGoalSummary || null);
+      }
+    } catch (error) {
+      console.error("Error loading AI summary:", error);
+      setAiSummary(null);
+    } finally {
+      setIsLoadingSummary(false);
     }
   };
 
@@ -146,6 +173,53 @@ const GoalProgressModal = ({
         <div className="modal-body">
           <div className="progress-tabs">
             <div className="tab-content">
+              {/* AI Summary Section */}
+              {subGoal && (
+                <div className="ai-summary-section">
+                  {isLoadingSummary ? (
+                    <div className="summary-loading">
+                      <p>Loading AI insights...</p>
+                    </div>
+                  ) : aiSummary ? (
+                    <div className="ai-summary-card">
+                      <div className="summary-header">
+                        <h3>🤖 AI Progress Analysis</h3>
+                        <span className="entry-badge">
+                          {aiSummary.entryCount} {aiSummary.entryCount === 1 ? 'entry' : 'entries'}
+                        </span>
+                      </div>
+                      <p className="summary-text">{aiSummary.summary}</p>
+
+                      {aiSummary.dateRange && (
+                        <div className="summary-meta">
+                          <span className="date-range">
+                            📅 {new Date(aiSummary.dateRange.start).toLocaleDateString()} - {new Date(aiSummary.dateRange.end).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+
+                      {aiSummary.moodDistribution && Object.keys(aiSummary.moodDistribution).length > 0 && (
+                        <div className="mood-summary">
+                          <span className="mood-label">Mood patterns:</span>
+                          {Object.entries(aiSummary.moodDistribution)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 3)
+                            .map(([mood, count]) => (
+                              <span key={mood} className="mood-chip">
+                                {mood} ({count})
+                              </span>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="ai-summary-empty">
+                      <p>💡 Start journaling to see AI-powered insights about your progress!</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Progress Form */}
               <form onSubmit={handleSubmit} className="progress-form">
                 <div className="form-group">
