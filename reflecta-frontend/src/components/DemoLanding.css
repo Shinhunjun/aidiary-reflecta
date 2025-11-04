@@ -568,6 +568,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
 }
 
 .demo-screenshot-caption {
@@ -577,6 +578,7 @@
   color: #a78bfa;
   margin: 0;
   padding: 8px 0;
+  transition: all 0.3s ease;
 }
 
 .demo-screenshot-placeholder {
@@ -588,11 +590,30 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   transition: all 0.4s ease;
   background: #0f172a; /* Match page background for seamless look */
+  cursor: pointer;
 }
 
-.demo-screenshot-placeholder:hover {
-  transform: scale(1.02);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+/* Hover effect - enlarge image to cover both grid cells */
+.demo-screenshot-wrapper:hover .demo-screenshot-placeholder {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200%;
+  transform: scale(1.15);
+  z-index: 100;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+/* Second item hover should expand to the left */
+.demo-screenshot-wrapper:nth-child(2):hover .demo-screenshot-placeholder {
+  left: auto;
+  right: 0;
+}
+
+/* Brighten caption on hover */
+.demo-screenshot-wrapper:hover .demo-screenshot-caption {
+  color: #c4b5fd;
+  transform: scale(1.05);
 }
 
 .demo-screenshot-placeholder img {
