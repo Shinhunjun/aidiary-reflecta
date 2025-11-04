@@ -76,7 +76,8 @@ const Dashboard = () => {
 
       try {
         setLoadingJournalSummary(true);
-        const summary = await apiService.getGoalJournalSummary(selectedGoalId);
+        // Use goalId (MongoDB _id) instead of selectedGoalId (mandalart ID)
+        const summary = await apiService.getGoalJournalSummary(goalId);
         setJournalSummary(summary);
       } catch (error) {
         console.error("Failed to fetch journal summary:", error);
@@ -87,7 +88,7 @@ const Dashboard = () => {
     };
 
     fetchJournalSummary();
-  }, [selectedGoalId]);
+  }, [selectedGoalId, goalId]);
 
   // Fetch children summary when goal is selected
   useEffect(() => {
@@ -99,7 +100,8 @@ const Dashboard = () => {
 
       try {
         setLoadingChildrenSummary(true);
-        const summary = await apiService.getGoalChildrenSummary(selectedGoalId);
+        // Use goalId (MongoDB _id) instead of selectedGoalId (mandalart ID)
+        const summary = await apiService.getGoalChildrenSummary(goalId);
         setChildrenSummary(summary);
       } catch (error) {
         console.error("Failed to fetch children summary:", error);
@@ -110,7 +112,7 @@ const Dashboard = () => {
     };
 
     fetchChildrenSummary();
-  }, [selectedGoalId]);
+  }, [selectedGoalId, goalId]);
 
   // Fetch journal entries when goal is selected
   useEffect(() => {
