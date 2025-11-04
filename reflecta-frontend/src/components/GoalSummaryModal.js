@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import WordCloud from "./WordCloud";
 import "./GoalSummaryModal.css";
@@ -14,50 +14,6 @@ const GoalSummaryModal = ({
   loadingChildrenSummary,
   loadingJournalEntries,
 }) => {
-  // Generate word cloud from journal entries
-  // Note: Must be before early return to comply with React Hooks rules
-  const journalWordCloud = useMemo(() => {
-    if (!journalEntries || journalEntries.length === 0) return [];
-
-    const stopWords = new Set([
-      "the", "be", "to", "of", "and", "a", "in", "that", "have", "i",
-      "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
-      "this", "but", "his", "by", "from", "they", "we", "say", "her", "she",
-      "or", "an", "will", "my", "one", "all", "would", "there", "their",
-      "what", "so", "up", "out", "if", "about", "who", "get", "which", "go",
-      "me", "when", "make", "can", "like", "time", "no", "just", "him", "know",
-      "take", "people", "into", "year", "your", "good", "some", "could", "them",
-      "see", "other", "than", "then", "now", "look", "only", "come", "its", "over",
-      "think", "also", "back", "after", "use", "two", "how", "our", "work",
-      "first", "well", "way", "even", "new", "want", "because", "any", "these",
-      "give", "day", "most", "us", "is", "was", "are", "been", "has", "had",
-      "were", "said", "did", "having", "may", "should"
-    ]);
-
-    // Extract all text from journal entries
-    const allText = journalEntries
-      .map(entry => `${entry.title} ${entry.content}`)
-      .join(' ')
-      .toLowerCase()
-      .replace(/[^a-z\s]/g, '')
-      .split(/\s+/)
-      .filter(word => word.length > 3 && !stopWords.has(word));
-
-    // Count word frequencies
-    const wordCount = {};
-    allText.forEach(word => {
-      wordCount[word] = (wordCount[word] || 0) + 1;
-    });
-
-    // Convert to array and sort by frequency
-    const sortedWords = Object.entries(wordCount)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 40) // Top 40 words
-      .map(([text, count]) => ({ text, count }));
-
-    return sortedWords;
-  }, [journalEntries]);
-
   if (!isOpen) return null;
 
   const getMoodEmoji = (mood) => {
@@ -298,21 +254,6 @@ const GoalSummaryModal = ({
                     )}
                   </>
                 )}
-              </div>
-            )}
-
-            {/* Journal Entries Word Cloud */}
-            {journalWordCloud && journalWordCloud.length > 0 && (
-              <div className="journal-entries-word-cloud-section">
-                <h3 className="summary-title">
-                  Your Journal Word Cloud
-                </h3>
-                <div className="word-cloud-container">
-                  <WordCloud words={journalWordCloud} />
-                </div>
-                <p className="word-cloud-description">
-                  This word cloud shows the most frequent terms from your {journalEntries.length} journal entries related to this goal.
-                </p>
               </div>
             )}
 
