@@ -59,6 +59,65 @@ const DemoLanding = () => {
     },
   ];
 
+  const featureShowcase = [
+    {
+      title: "Ohtani Shohei's Secret Weapon",
+      subtitle: "Mandalart Goal Setting Framework",
+      description: "The same goal-setting system used by MLB superstar Shohei Ohtani to achieve his dreams. Break down your single core goal into 8 focused sub-goals, then expand each into 8 actionable tasks—creating a comprehensive roadmap of 64 concrete steps.",
+      highlights: [
+        "Visual 9×9 grid makes complex goals manageable",
+        "Color-coded categories for life balance",
+        "Track progress across all 64 actionable tasks",
+        "Pre-loaded demo with complete goal structure"
+      ],
+      screenshot: "/screenshots/mandalart-grid.png",
+      imageAlt: "Mandalart 9x9 goal-setting grid"
+    },
+    {
+      title: "Choose Your Perfect AI Companion",
+      subtitle: "6 AI Personas + Custom Creation",
+      description: "Every conversation style is different. Select from our carefully crafted personas—each with unique approaches to reflection and growth—or create your own custom persona with personalized prompts and personality traits.",
+      highlights: [
+        "Empathetic Listener for emotional support",
+        "Goal Coach for achievement-focused reflection",
+        "Analytical Advisor for problem-solving",
+        "Creative Explorer for imaginative thinking",
+        "Plus Mindfulness Guide & Balanced All-Rounder",
+        "Create unlimited custom personas"
+      ],
+      screenshot: "/screenshots/personas-selector.png",
+      imageAlt: "AI Persona selection interface"
+    },
+    {
+      title: "Talk Naturally, Journal Effortlessly",
+      subtitle: "Chat → Auto Diary Conversion",
+      description: "Research shows people express 75% more emotions in conversation than writing. Chat with AI like you're talking to a friend, then instantly convert those conversations into structured journal entries with automatic goal mapping and mood detection.",
+      highlights: [
+        "Natural conversation interface—no blank page anxiety",
+        "Select any messages to convert to diary",
+        "Automatic goal mapping to your Mandalart",
+        "Mood tracking and emotion analysis",
+        "Edit and refine AI-generated entries"
+      ],
+      screenshot: "/screenshots/chat-to-diary.png",
+      imageAlt: "Chat to diary conversion process"
+    },
+    {
+      title: "Understand Your Growth Patterns",
+      subtitle: "AI-Powered Insights & Analytics",
+      description: "Transform your journal entries into actionable insights. Our AI analyzes your reflections to reveal patterns, track emotional trends, correlate mood with goals, and generate beautiful visualizations of your personal growth journey.",
+      highlights: [
+        "Word clouds highlight your focus areas",
+        "AI-generated summaries (7-day cache for efficiency)",
+        "Mood-goal correlation analysis",
+        "Progress charts and timeline views",
+        "Search and filter by mood, tags, or goals"
+      ],
+      screenshot: "/screenshots/ai-insights.png",
+      imageAlt: "AI insights dashboard with word cloud and charts"
+    }
+  ];
+
   return (
     <div className="demo-landing-container">
       {/* Hero Section */}
@@ -200,6 +259,55 @@ const DemoLanding = () => {
               ))}
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Feature Showcase Section with Screenshots */}
+      <section className="demo-section demo-showcase-section">
+        <div className="demo-container">
+          {featureShowcase.map((feature, index) => (
+            <motion.div
+              key={index}
+              className={`demo-showcase-item ${index % 2 === 1 ? "reverse" : ""}`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: index * 0.2 }}
+            >
+              <div className="demo-showcase-image">
+                <div className="demo-screenshot-placeholder">
+                  <img
+                    src={feature.screenshot}
+                    alt={feature.imageAlt}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="demo-screenshot-fallback" style={{ display: 'none' }}>
+                    <span className="demo-screenshot-icon">📸</span>
+                    <p>Screenshot Coming Soon</p>
+                    <small>{feature.imageAlt}</small>
+                  </div>
+                </div>
+              </div>
+
+              <div className="demo-showcase-content">
+                <div className="demo-showcase-badge">Feature {String(index + 1).padStart(2, '0')}</div>
+                <h3 className="demo-showcase-title">{feature.title}</h3>
+                <h4 className="demo-showcase-subtitle">{feature.subtitle}</h4>
+                <p className="demo-showcase-description">{feature.description}</p>
+                <ul className="demo-showcase-highlights">
+                  {feature.highlights.map((highlight, hIndex) => (
+                    <li key={hIndex}>
+                      <span className="demo-highlight-icon">✓</span>
+                      {highlight}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
