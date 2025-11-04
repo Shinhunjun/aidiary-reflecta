@@ -158,6 +158,23 @@ const DemoLanding = () => {
               Try the full demo with pre-loaded data. See how AI personas, chat-to-diary conversion,
               Mandalart goal-setting, and intelligent insights work together to transform your personal growth journey.
             </p>
+
+            <motion.div
+              className="demo-scroll-indicator"
+              onClick={scrollToNextSection}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.6 }}
+            >
+              <motion.div
+                className="demo-scroll-arrow"
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                ↓
+              </motion.div>
+              <span className="demo-scroll-text">Scroll to explore</span>
+            </motion.div>
           </motion.div>
         </div>
 
@@ -166,23 +183,6 @@ const DemoLanding = () => {
           <div className="demo-gradient-orb demo-orb-2"></div>
           <div className="demo-gradient-orb demo-orb-3"></div>
         </div>
-
-        <motion.div
-          className="demo-scroll-indicator"
-          onClick={scrollToNextSection}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-        >
-          <motion.div
-            className="demo-scroll-arrow"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            ↓
-          </motion.div>
-          <span className="demo-scroll-text">Scroll to explore</span>
-        </motion.div>
       </section>
 
       {/* Problem → Solution Section */}
