@@ -26,10 +26,12 @@ const PersonaSelector = ({ isOpen, onClose, currentPersonaId, onSelectPersona })
     try {
       setLoading(true);
       setError(null);
+      console.log('[PersonaSelector] Fetching personas...');
       const data = await apiService.getPersonas();
+      console.log('[PersonaSelector] Fetched personas:', data.length, data);
       setPersonas(data);
     } catch (err) {
-      console.error("Failed to fetch personas:", err);
+      console.error("[PersonaSelector] Failed to fetch personas:", err);
       setError("Failed to load personas. Please try again.");
     } finally {
       setLoading(false);

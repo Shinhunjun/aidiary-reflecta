@@ -88,18 +88,27 @@ const Chat = () => {
   // Load default persona on mount
   useEffect(() => {
     const loadDefaultPersona = async () => {
-      if (!user?.id) return;
+      if (!user?.id) {
+        console.log('[Chat] Skipping persona load - no user ID');
+        return;
+      }
 
       try {
+        console.log('[Chat] Loading personas for user:', user.id);
         const personas = await apiService.getPersonas();
-        // Select first default persona (Empathetic Listener)
-        const defaultPersona = personas.find(p => p.isDefault) || personas[0];
+        console.log('[Chat] Received personas:', personas.length, personas);
+
+        // Select first persona (prioritize user's personal personas over default)
+        const defaultPersona = personas[0];
         if (defaultPersona) {
+          console.log('[Chat] Setting default persona:', defaultPersona.displayName);
           setSelectedPersonaId(defaultPersona._id);
           setCurrentPersona(defaultPersona);
+        } else {
+          console.warn('[Chat] No personas available');
         }
       } catch (error) {
-        console.error("Error loading default persona:", error);
+        console.error("[Chat] Error loading default persona:", error);
       }
     };
 
