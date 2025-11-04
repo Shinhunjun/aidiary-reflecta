@@ -29,7 +29,7 @@ const PersonaCard = ({ persona, isSelected, onSelect, onDelete, showDetails = fa
 
   return (
     <motion.div
-      className={`persona-card ${isSelected ? "selected" : ""}`}
+      className={`persona-card ${isSelected ? "selected" : ""} ${!persona.isDefault ? "custom" : ""}`}
       onClick={onSelect}
       whileHover={{ scale: 1.02, y: -4 }}
       whileTap={{ scale: 0.98 }}
@@ -73,24 +73,17 @@ const PersonaCard = ({ persona, isSelected, onSelect, onDelete, showDetails = fa
         )}
       </div>
 
-      {!persona.isDefault && (
-        <>
-          <div className="persona-custom-badge">
-            <span>Custom</span>
-          </div>
-          {onDelete && (
-            <button
-              className="persona-delete-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(persona._id);
-              }}
-              title="Delete persona"
-            >
-              🗑️
-            </button>
-          )}
-        </>
+      {!persona.isDefault && onDelete && (
+        <button
+          className="persona-delete-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(persona._id);
+          }}
+          title="Delete custom persona"
+        >
+          🗑️
+        </button>
       )}
     </motion.div>
   );
