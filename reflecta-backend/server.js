@@ -1793,11 +1793,12 @@ Keep the summary concise (3-4 paragraphs), supportive, and insightful.`
         goalText,
       };
 
-      // Cache the summary for 7 days
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
+      // Get user to check if demo
+      const user = await User.findById(userId);
+      const isDemoUser = user && user.email === 'demo@reflecta.com';
 
-      await GoalSummary.create({
+      // Create summary data object
+      const summaryData = {
         userId,
         goalId,
         summaryType: "journal",
@@ -1810,9 +1811,17 @@ Keep the summary concise (3-4 paragraphs), supportive, and insightful.`
           wordCloud: wordCloudData,
           goalText,
         },
-        expiresAt,
-      });
-      console.log(`Cached journal summary for goal ${goalId} (expires in 7 days)`);
+      };
+
+      // Only set expiresAt for non-demo users (demo summaries are permanent)
+      if (!isDemoUser) {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+        summaryData.expiresAt = expiresAt;
+      }
+
+      await GoalSummary.create(summaryData);
+      console.log(`Cached journal summary for goal ${goalId}${isDemoUser ? ' (permanent for demo user)' : ' (expires in 7 days)'}`);
 
       res.json(responseData);
 
@@ -2025,11 +2034,12 @@ Keep it concise (3-4 paragraphs), motivational, and actionable.`
         childGoalsSummaries: childSummaries,
       };
 
-      // Cache the summary for 7 days
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
+      // Get user to check if demo
+      const user = await User.findById(userId);
+      const isDemoUser = user && user.email === 'demo@reflecta.com';
 
-      await GoalSummary.create({
+      // Create summary data object
+      const summaryData = {
         userId,
         goalId,
         summaryType: "children",
@@ -2040,9 +2050,17 @@ Keep it concise (3-4 paragraphs), motivational, and actionable.`
           childGoalsCount: childGoalIds.length,
           childGoalsSummaries: childSummaries,
         },
-        expiresAt,
-      });
-      console.log(`Cached children summary for goal ${goalId} (expires in 7 days)`);
+      };
+
+      // Only set expiresAt for non-demo users (demo summaries are permanent)
+      if (!isDemoUser) {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+        summaryData.expiresAt = expiresAt;
+      }
+
+      await GoalSummary.create(summaryData);
+      console.log(`Cached children summary for goal ${goalId}${isDemoUser ? ' (permanent for demo user)' : ' (expires in 7 days)'}`);
 
       res.json(responseData);
 
@@ -3193,11 +3211,12 @@ app.get(
         currentWords = extractWords(allEntries);
       }
 
-      // Cache the word cloud for 7 days
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
+      // Get user to check if demo
+      const user = await User.findById(userId);
+      const isDemoUser = user && user.email === 'demo@reflecta.com';
 
-      await GoalSummary.create({
+      // Create word cloud cache data object
+      const wordCloudData = {
         userId,
         goalId,
         summaryType: "wordcloud",
@@ -3209,10 +3228,18 @@ app.get(
             past: pastWords,
           },
         },
-        expiresAt,
-      });
+      };
 
-      console.log(`Cached word cloud for goal ${goalId}, timeRange: ${timeRange} (expires in 7 days)`);
+      // Only set expiresAt for non-demo users (demo summaries are permanent)
+      if (!isDemoUser) {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+        wordCloudData.expiresAt = expiresAt;
+      }
+
+      await GoalSummary.create(wordCloudData);
+
+      console.log(`Cached word cloud for goal ${goalId}, timeRange: ${timeRange}${isDemoUser ? ' (permanent for demo user)' : ' (expires in 7 days)'}`);
 
       // Return response
       if (timeRange === 'comparison') {

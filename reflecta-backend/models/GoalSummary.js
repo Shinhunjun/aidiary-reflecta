@@ -36,7 +36,7 @@ const goalSummarySchema = new mongoose.Schema({
   },
   expiresAt: {
     type: Date,
-    required: true,
+    required: false, // Optional - demo user summaries are permanent (no expiresAt)
     index: true,
   },
 });

@@ -238,6 +238,7 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  width: 100%;
 }
 
 .mandalart-grid {
@@ -252,6 +253,7 @@
   border: 2px solid #334155;
   border-radius: 16px;
   padding: 10px;
+  margin: 0 auto; /* Center the grid */
 }
 
 /* 9x9 Mandalart Grid */
