@@ -192,6 +192,7 @@ const Chat = () => {
       currentTourStep,
       isSelectMode,
       showDiaryModal,
+      showPersonaSelector,
       messageCount: messages.length
     });
 
@@ -200,17 +201,33 @@ const Chat = () => {
 
     console.log('[Chat Tour] On correct page, step:', currentTourStep.stepIndex);
 
-    // Step 5: Auto-enable selection mode (FIXED from step 7)
-    if (currentTourStep.stepIndex === 5 && !isSelectMode) {
-      console.log('[Chat Tour] Step 5 - Auto-enabling selection mode...');
+    // Step 1: Auto-open persona selector modal
+    if (currentTourStep.stepIndex === 1 && !showPersonaSelector) {
+      console.log('[Chat Tour] Step 1 - Auto-opening persona selector...');
+      setTimeout(() => {
+        setShowPersonaSelector(true);
+      }, 300);
+    }
+
+    // Step 2 or later: Close persona selector if open
+    if (currentTourStep.stepIndex >= 2 && showPersonaSelector) {
+      console.log('[Chat Tour] Step 2+ - Auto-closing persona selector...');
+      setTimeout(() => {
+        setShowPersonaSelector(false);
+      }, 300);
+    }
+
+    // Step 4: Auto-enable selection mode (UPDATED from step 5 after removing step 3)
+    if (currentTourStep.stepIndex === 4 && !isSelectMode) {
+      console.log('[Chat Tour] Step 4 - Auto-enabling selection mode...');
       setTimeout(() => {
         setIsSelectMode(true);
       }, 300);
     }
 
-    // Step 6: Auto-select first 2 user messages
-    if (currentTourStep.stepIndex === 6 && isSelectMode && selectedMessages.length === 0) {
-      console.log('[Chat Tour] Step 6 - Auto-selecting messages...');
+    // Step 5: Auto-select first 2 user messages (UPDATED from step 6)
+    if (currentTourStep.stepIndex === 5 && isSelectMode && selectedMessages.length === 0) {
+      console.log('[Chat Tour] Step 5 - Auto-selecting messages...');
       setTimeout(() => {
         const userMessages = messages.filter(m => m.sender === 'user');
         console.log('[Chat Tour] Found user messages:', userMessages.length);
@@ -221,9 +238,9 @@ const Chat = () => {
       }, 300);
     }
 
-    // Step 7: Auto-click "Convert to Diary" button
-    if (currentTourStep.stepIndex === 7 && selectedMessages.length > 0 && !showDiaryModal) {
-      console.log('[Chat Tour] Step 7 - Auto-clicking Convert to Diary button...');
+    // Step 6: Auto-click "Convert to Diary" button (UPDATED from step 7)
+    if (currentTourStep.stepIndex === 6 && selectedMessages.length > 0 && !showDiaryModal) {
+      console.log('[Chat Tour] Step 6 - Auto-clicking Convert to Diary button...');
       setTimeout(() => {
         // Find and click the convert button
         const convertButton = document.querySelector('.convert-button');
@@ -236,18 +253,18 @@ const Chat = () => {
       }, 500);
     }
 
-    // Step 8: Diary modal should be open (modal opens from convert button click)
-    // No action needed - modal opened by button click in step 7
+    // Step 7: Diary modal should be open (modal opens from convert button click)
+    // No action needed - modal opened by button click in step 6
 
-    // Step 10 or later: Close diary modal if open (FIXED from step 11)
-    if (currentTourStep.stepIndex >= 10 && showDiaryModal) {
-      console.log('[Chat Tour] Step 10+ - Auto-closing diary modal...');
+    // Step 9 or later: Close diary modal if open (UPDATED from step 10)
+    if (currentTourStep.stepIndex >= 9 && showDiaryModal) {
+      console.log('[Chat Tour] Step 9+ - Auto-closing diary modal...');
       setTimeout(() => {
         setShowDiaryModal(false);
         clearSelection();
       }, 300);
     }
-  }, [tourActive, currentTourStep, messages, isSelectMode, showDiaryModal, selectedMessages, clearSelection]);
+  }, [tourActive, currentTourStep, messages, isSelectMode, showDiaryModal, showPersonaSelector, selectedMessages, clearSelection]);
 
   // 대화 초기화 함수
   const resetMessages = () => {
@@ -701,7 +718,7 @@ const Chat = () => {
       <PageTour
         page="chat"
         navigateToNext="dashboard"
-        pageTotalSteps={12}
+        pageTotalSteps={11}
         pageStartStep={9}
         steps={[
           {
@@ -723,15 +740,9 @@ const Chat = () => {
             selector: ".chat-input",
           },
           {
-            icon: "📨",
-            title: "Send Your Thoughts",
-            description: "Hit send to get an AI response! The AI will ask follow-up questions, provide perspective, and help you explore your thoughts. This back-and-forth dialogue becomes the foundation for rich journal entries.",
-            selector: ".send-button",
-          },
-          {
             icon: "🤖",
             title: "AI Responds Thoughtfully",
-            description: "Watch as the AI analyzes your message and responds. It considers your goals, past reflections, and current context to provide personalized guidance. The conversation flows naturally while staying focused on your growth.",
+            description: "The AI responds with empathy and insight! You can discuss anything - daily events, relationships, hobbies, challenges at work. While the AI is aware of your goals, conversations don't have to focus on them. It's about authentic reflection on your life.",
             selector: ".chat-messages",
           },
           {
@@ -771,8 +782,7 @@ const Chat = () => {
             icon: "💾",
             title: "Save to Database",
             description: "Click 'Save to Journal' and your entry is permanently stored with all its goal mappings! It becomes part of your reflection history and contributes to AI-generated summaries, word clouds, and progress analytics.",
-            selector: ".save-diary-btn",
-            waitForElement: true,
+            selector: null,
           },
           {
             icon: "📊",

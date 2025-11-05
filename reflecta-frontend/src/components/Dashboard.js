@@ -458,14 +458,14 @@ const Dashboard = () => {
             icon: "💡",
             title: "Goal Detail Modal Opens",
             description: "Watch as we automatically open the first sub-goal's detail modal! This shows AI progress analysis, distinctive word clouds (words unique to that goal), and all related journal entries. This is where goal mapping pays off!",
-            selector: ".goal-summary-modal",
+            selector: ".modal-overlay",
             waitForElement: true,
           },
           {
             icon: "📝",
             title: "Sub-Goal Insights",
             description: "Inside the modal, see AI-generated summaries about your progress on this specific sub-goal, word clouds showing distinctive vocabulary, and a timeline of all journal entries related to it. Each goal gets its own unique analysis!",
-            selector: ".word-cloud-section",
+            selector: ".modal-content .word-cloud-section",
             waitForElement: true,
           },
           {

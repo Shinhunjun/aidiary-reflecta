@@ -55,8 +55,8 @@ const DemoLanding = () => {
     try {
       const result = await loginAsDemo();
       if (result.success) {
-        // Set total steps for the complete tour (Goal Setting: 9, Chat: 12, Dashboard: 10)
-        updateTotalSteps(31);
+        // Set total steps for the complete tour (Goal Setting: 9, Chat: 11, Dashboard: 11)
+        updateTotalSteps(30);
 
         // Start the guided tour - this will navigate to goal-setting automatically
         startTour();
