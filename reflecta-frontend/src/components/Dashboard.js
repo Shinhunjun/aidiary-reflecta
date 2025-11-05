@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useTour } from "../contexts/TourContext";
 import apiService from "../services/api";
 import GoalSummaryModal from "./GoalSummaryModal";
 import EmotionalJourneyMap from "./EmotionalJourneyMap";
@@ -13,6 +14,7 @@ import "./Dashboard.css";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { tourActive, currentTourStep } = useTour();
   const [goals, setGoals] = useState(null);
   const [goalId, setGoalId] = useState(null); // Store the Goal document _id
   const [journalStats, setJournalStats] = useState({ total: 0, thisWeek: 0 });
@@ -174,6 +176,29 @@ const Dashboard = () => {
     setSelectedGoalText(goal.text);
     setShowSummaryModal(true);
   };
+
+  // Tour mode: Auto-open goal summary modal for demonstration
+  useEffect(() => {
+    if (!tourActive || !currentTourStep) return;
+    if (currentTourStep.pageId !== 'dashboard') return;
+
+    // Step 3: Auto-open goal summary modal with first goal
+    if (currentTourStep.stepIndex === 3 && !showSummaryModal && goals?.subGoals) {
+      const firstGoalWithText = goals.subGoals.find((g) => g && g.text);
+      if (firstGoalWithText) {
+        setTimeout(() => {
+          handleGoalClick(firstGoalWithText);
+        }, 300);
+      }
+    }
+
+    // Step 5 or later: Close modal if open and we've moved past modal steps
+    if (currentTourStep.stepIndex >= 5 && showSummaryModal) {
+      setTimeout(() => {
+        setShowSummaryModal(false);
+      }, 300);
+    }
+  }, [tourActive, currentTourStep, goals, showSummaryModal]);
 
   const calculateGoalStats = () => {
     if (!goals || !goals.subGoals) {
@@ -395,7 +420,7 @@ const Dashboard = () => {
       {/* Page Tour for Demo Users */}
       <PageTour
         page="dashboard"
-        pageTotalSteps={10}
+        pageTotalSteps={11}
         pageStartStep={21}
         steps={[
           {
@@ -418,9 +443,17 @@ const Dashboard = () => {
           },
           {
             icon: "💡",
-            title: "Click a Sub-Goal",
-            description: "Try clicking 'Career Excellence' or any other sub-goal card! A modal will open showing AI progress analysis, distinctive word clouds (words unique to that goal), and all related journal entries. This is where goal mapping pays off!",
-            selector: ".goal-card",
+            title: "Goal Detail Modal Opens",
+            description: "Watch as we automatically open the first sub-goal's detail modal! This shows AI progress analysis, distinctive word clouds (words unique to that goal), and all related journal entries. This is where goal mapping pays off!",
+            selector: ".goal-summary-modal",
+            waitForElement: true,
+          },
+          {
+            icon: "📝",
+            title: "Sub-Goal Insights",
+            description: "Inside the modal, see AI-generated summaries about your progress on this specific sub-goal, word clouds showing distinctive vocabulary, and a timeline of all journal entries related to it. Each goal gets its own unique analysis!",
+            selector: ".word-cloud-section",
+            waitForElement: true,
           },
           {
             icon: "🤖",

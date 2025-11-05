@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useTour } from "../contexts/TourContext";
 import apiService from "../services/api";
 import GoalProgressModal from "./GoalProgressModal";
 import PageTour from "./PageTour";
@@ -32,6 +33,7 @@ const createEmptyMandalart = (idPrefix = "goal") => {
 
 const GoalSetting = () => {
   const { user } = useAuth();
+  const { tourActive, currentTourStep } = useTour();
 
   // Main state for the entire Mandalart structure
   const [mainMandalart, setMainMandalart] = useState(
@@ -518,6 +520,32 @@ const GoalSetting = () => {
     setExpandedGoalColorIndex(null);
     setExpandedGoalParent(null);
   };
+
+  // Tour mode: Auto-expand grid for specific steps
+  useEffect(() => {
+    if (!tourActive || !currentTourStep) return;
+    if (currentTourStep.pageId !== 'goal-setting') return;
+
+    // Step 5: Auto-expand first sub-goal to show 3x3 detail grid
+    if (currentTourStep.stepIndex === 5 && mainMandalart?.subGoals) {
+      const firstGoalWithText = mainMandalart.subGoals.find(
+        (g) => g && g.text && g.id !== mainMandalart.id
+      );
+      if (firstGoalWithText && !expandedGoal) {
+        // Small delay to ensure DOM is ready
+        setTimeout(() => {
+          zoomIn(firstGoalWithText, 0, mainMandalart.id, 0);
+        }, 300);
+      }
+    }
+
+    // Step 7 or later: Close expanded view if still open
+    if (currentTourStep.stepIndex >= 7 && expandedGoal) {
+      setTimeout(() => {
+        zoomOut();
+      }, 300);
+    }
+  }, [tourActive, currentTourStep, mainMandalart, expandedGoal]);
 
   // Toggle goal completion function removed
 
@@ -1637,14 +1665,16 @@ const GoalSetting = () => {
           {
             icon: "🔍",
             title: "Expand a Sub-Goal",
-            description: "Click any sub-goal cell to zoom in and see its 8 actionable tasks. This is where you define concrete steps. Try clicking 'Career Excellence' to see its breakdown into specific actions like 'Network with industry leaders' or 'Complete certification'.",
-            selector: ".mandalart-cell:not(.center):not(.empty)",
+            description: "Watch as we automatically expand the first sub-goal to show its 8 actionable tasks! This is where you define concrete steps - specific actions like 'Network with industry leaders' or 'Complete certification'. The tour will open this for you automatically.",
+            selector: ".expanded-goal-overlay",
+            waitForElement: true,
           },
           {
             icon: "✅",
             title: "64 Action Tasks",
-            description: "When you expand a sub-goal, you'll see another 3x3 grid. These are your action-level tasks - the specific things you'll do. 8 sub-goals × 8 tasks each = 64 actionable items! That's the power of Mandalart.",
-            selector: ".mandalart-grid",
+            description: "Here's the expanded 3x3 grid showing action-level tasks for this sub-goal! These are the specific things you'll do. 8 sub-goals × 8 tasks each = 64 actionable items! That's the power of Mandalart. The center shows the sub-goal, surrounded by 8 tasks.",
+            selector: ".expanded-goal-overlay .mandalart-grid",
+            waitForElement: true,
           },
           {
             icon: "💾",

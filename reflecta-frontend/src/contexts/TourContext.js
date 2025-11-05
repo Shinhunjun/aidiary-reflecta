@@ -17,6 +17,7 @@ export const TourProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState('');
   const [globalStep, setGlobalStep] = useState(0);
   const [totalSteps, setTotalSteps] = useState(0);
+  const [currentTourStep, setCurrentTourStep] = useState(null); // { pageId, stepIndex }
 
   // Check if tour is active on mount
   useEffect(() => {
@@ -94,17 +95,23 @@ export const TourProvider = ({ children }) => {
     setTotalSteps(total);
   };
 
+  const updateCurrentTourStep = (pageId, stepIndex) => {
+    setCurrentTourStep({ pageId, stepIndex });
+  };
+
   const value = {
     tourActive,
     currentPage,
     globalStep,
     totalSteps,
+    currentTourStep,
     startTour,
     endTour,
     clearAllTourProgress,
     navigateToNextPage,
     updateGlobalStep,
     updateTotalSteps,
+    updateCurrentTourStep,
   };
 
   return <TourContext.Provider value={value}>{children}</TourContext.Provider>;

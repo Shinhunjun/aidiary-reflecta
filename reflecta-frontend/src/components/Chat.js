@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useJournal } from "../contexts/JournalContext";
+import { useTour } from "../contexts/TourContext";
 import apiService from "../services/api";
 import PersonaSelector from "./PersonaSelector";
 import PageTour from "./PageTour";
@@ -11,6 +12,7 @@ import "./Chat.css";
 const Chat = () => {
   const { user } = useAuth();
   const { addJournalEntry, triggerRefresh } = useJournal();
+  const { tourActive, currentTourStep } = useTour();
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -135,6 +137,47 @@ const Chat = () => {
     setSelectedMessages([]);
     setIsSelectMode(false);
   };
+
+  // Tour mode: Auto-enable selection and show diary modal
+  useEffect(() => {
+    if (!tourActive || !currentTourStep) return;
+    if (currentTourStep.pageId !== 'chat') return;
+
+    // Step 7: Auto-enable selection mode and select first 2 user messages
+    if (currentTourStep.stepIndex === 7 && !isSelectMode) {
+      setTimeout(() => {
+        setIsSelectMode(true);
+        const userMessages = messages.filter(m => m.sender === 'user');
+        if (userMessages.length >= 2) {
+          setSelectedMessages([userMessages[0].id, userMessages[1].id]);
+        }
+      }, 300);
+    }
+
+    // Step 9: Auto-open diary modal with demo content
+    if (currentTourStep.stepIndex === 9 && !showDiaryModal) {
+      setTimeout(() => {
+        setDiaryContent(
+          "Today was a productive day working on my goals. I had a meaningful conversation with my AI assistant about my career aspirations and personal growth. I realized that breaking down my goals into smaller tasks makes them feel more achievable. I'm excited to see my progress over time!"
+        );
+        setDiaryMood("happy");
+        setGoalMapping({
+          relatedGoalId: "demo-goal-1",
+          confidence: 0.85,
+          goalText: "Career Excellence"
+        });
+        setShowDiaryModal(true);
+      }, 300);
+    }
+
+    // Step 11 or later: Close diary modal if open
+    if (currentTourStep.stepIndex >= 11 && showDiaryModal) {
+      setTimeout(() => {
+        setShowDiaryModal(false);
+        clearSelection();
+      }, 300);
+    }
+  }, [tourActive, currentTourStep, messages, isSelectMode, showDiaryModal]);
 
   // 대화 초기화 함수
   const resetMessages = () => {

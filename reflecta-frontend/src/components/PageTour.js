@@ -22,7 +22,8 @@ const PageTour = ({
     globalStep,
     totalSteps,
     updateGlobalStep,
-    navigateToNextPage
+    navigateToNextPage,
+    updateCurrentTourStep
   } = useTour();
 
   // Update highlight position on scroll and resize
@@ -105,6 +106,9 @@ const PageTour = ({
     if (pageTotalSteps) {
       updateGlobalStep(pageStartStep + stepIndex);
     }
+
+    // Notify components of current tour step
+    updateCurrentTourStep(page, stepIndex);
   };
 
   const setupActionListener = (step) => {
