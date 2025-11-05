@@ -220,80 +220,6 @@ const DemoLanding = () => {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="demo-section demo-team-section">
-        <div className="demo-container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="demo-section-title">Meet Our Team</h2>
-            <p className="demo-section-subtitle">
-              AI & HCI experts building the future of personal growth
-            </p>
-
-            <div className="demo-team-grid">
-              <motion.div
-                className="demo-team-card"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-              >
-                <div className="demo-team-avatar">👨‍💻</div>
-                <h3>Hunjun Sin</h3>
-                <div className="demo-team-role">Lead Developer & AI Engineer</div>
-                <p className="demo-team-bio">
-                  Full-stack developer specializing in AI integration and user experience design.
-                  Passionate about using technology to support mental wellness.
-                </p>
-              </motion.div>
-
-              <motion.div
-                className="demo-team-card"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <div className="demo-team-avatar">🧠</div>
-                <h3>HCI Research Team</h3>
-                <div className="demo-team-role">UX Research & Psychology</div>
-                <p className="demo-team-bio">
-                  Human-Computer Interaction specialists researching emotional AI and
-                  conversational interfaces for personal growth applications.
-                </p>
-              </motion.div>
-
-              <motion.div
-                className="demo-team-card"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <div className="demo-team-avatar">🎯</div>
-                <h3>Product Strategy</h3>
-                <div className="demo-team-role">Mental Health & Goal Science</div>
-                <p className="demo-team-bio">
-                  Combining evidence-based psychology with proven goal-setting frameworks
-                  like Mandalart to create structured growth pathways.
-                </p>
-              </motion.div>
-            </div>
-
-            <div className="demo-team-expertise">
-              <div className="demo-expertise-badge">🚀 AI/ML Development</div>
-              <div className="demo-expertise-badge">🎨 UX/UI Design</div>
-              <div className="demo-expertise-badge">🧠 Psychology Research</div>
-              <div className="demo-expertise-badge">📊 Data Analytics</div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Problem → Solution Section */}
       <section className="demo-section demo-problem-solution">
         <div className="demo-container">
@@ -649,6 +575,221 @@ const DemoLanding = () => {
         </div>
       </section>
 
+      {/* Future Vision Section */}
+      <section className="demo-section demo-future-vision-section">
+        <div className="demo-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="demo-section-title">Future Vision: Proactive AI Companion</h2>
+            <p className="demo-section-subtitle">
+              Beyond passive logging — an AI that knows your life, nudges toward goals, and supports your mental wellness 24/7
+            </p>
+
+            <div className="demo-vision-intro">
+              <p>
+                <strong>The Problem with Current Apps:</strong> They wait for you to log in. If you forget, your streak breaks.
+                No continuity, no proactive support.
+              </p>
+              <p>
+                <strong>Our Vision:</strong> An AI companion that integrates with your calendar, understands your goals,
+                and initiates conversations like a supportive friend — creating a continuous growth system that works even when you don't think to open the app.
+              </p>
+            </div>
+
+            {/* Feature Cards */}
+            <div className="demo-vision-features">
+              {/* Feature 1: Smart Calendar Integration */}
+              <motion.div
+                className="demo-vision-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <div className="demo-vision-number">1</div>
+                <div className="demo-vision-icon">📅🧠</div>
+                <h3>Smart Calendar Integration (RAG-Powered)</h3>
+                <p className="demo-vision-description">
+                  AI reads your Google Calendar and past journal entries using Retrieval-Augmented Generation (RAG).
+                  When an event ends, it proactively texts: <em>"Hey! I saw your project presentation just finished. How did it go?"</em>
+                </p>
+                <div className="demo-vision-mockup">
+                  <div className="demo-mockup-phone">
+                    <div className="demo-mockup-header">
+                      <span>🤖 Reflecta AI</span>
+                      <span className="demo-mockup-time">2:35 PM</span>
+                    </div>
+                    <div className="demo-mockup-message demo-ai-message">
+                      <p>Hey! I noticed your "Final Presentation" event just ended at 2:30 PM.</p>
+                      <p>How did it go? You mentioned feeling nervous about it in yesterday's journal 😊</p>
+                    </div>
+                    <div className="demo-mockup-input">Reply...</div>
+                  </div>
+                </div>
+                <div className="demo-vision-tech">
+                  <strong>Tech:</strong> Google Calendar API + Vector DB (journal embeddings) + GPT-4 context synthesis
+                </div>
+              </motion.div>
+
+              {/* Feature 2: AI-Initiated Conversations */}
+              <motion.div
+                className="demo-vision-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <div className="demo-vision-number">2</div>
+                <div className="demo-vision-icon">💬✨</div>
+                <h3>AI-Initiated Check-Ins (Like a Friend)</h3>
+                <p className="demo-vision-description">
+                  Instead of waiting for you to log in, the AI sends periodic check-ins via SMS/push notifications based on
+                  your calendar events, mood patterns, and time since last journal entry. Feels less like an app, more like a caring friend.
+                </p>
+                <div className="demo-vision-mockup">
+                  <div className="demo-mockup-notification-list">
+                    <div className="demo-notification">
+                      <span className="demo-notif-icon">🤖</span>
+                      <div className="demo-notif-content">
+                        <strong>Morning nudge</strong>
+                        <p>Good morning! You have "Team Meeting" at 10 AM. Remember your goal to "speak up more in meetings" 💪</p>
+                        <span className="demo-notif-time">8:00 AM</span>
+                      </div>
+                    </div>
+                    <div className="demo-notification">
+                      <span className="demo-notif-icon">🤖</span>
+                      <div className="demo-notif-content">
+                        <strong>Evening reflection prompt</strong>
+                        <p>You haven't journaled in 3 days. How are you feeling today?</p>
+                        <span className="demo-notif-time">8:30 PM</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="demo-vision-tech">
+                  <strong>Tech:</strong> Scheduled push notifications + behavioral pattern analysis + personalized prompts
+                </div>
+              </motion.div>
+
+              {/* Feature 3: Goal-Aligned Daily Prompts */}
+              <motion.div
+                className="demo-vision-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <div className="demo-vision-number">3</div>
+                <div className="demo-vision-icon">🎯💭</div>
+                <h3>Goal-Aligned Emotional Nudges</h3>
+                <p className="demo-vision-description">
+                  Combines emotional tracking with accountability. AI knows your Mandalart goals and current emotional state,
+                  then sends prompts like: <em>"You wanted to exercise 3x/week. It's Tuesday and you haven't logged a workout.
+                  What's holding you back?"</em> — turning reflection into action.
+                </p>
+                <div className="demo-vision-mockup">
+                  <div className="demo-mockup-chat">
+                    <div className="demo-chat-message demo-ai-msg">
+                      <strong>🎯 Goal Reminder</strong>
+                      <p>You set a goal to "Read 20 pages daily" but haven't logged reading in 4 days.</p>
+                      <p>What's been getting in the way? Let's troubleshoot together 📚</p>
+                    </div>
+                    <div className="demo-chat-message demo-user-msg">
+                      <p>I've been too tired after work...</p>
+                    </div>
+                    <div className="demo-chat-message demo-ai-msg">
+                      <p>That makes sense. What if we adjusted your goal to "Read 10 pages before bed" instead?
+                      Small wins build momentum 💪</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="demo-vision-tech">
+                  <strong>Tech:</strong> Goal progress tracking + journal sentiment analysis + adaptive nudge engine
+                </div>
+              </motion.div>
+
+              {/* Feature 4: Counselor Priority Matching */}
+              <motion.div
+                className="demo-vision-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <div className="demo-vision-number">4</div>
+                <div className="demo-vision-icon">👨‍⚕️🔍</div>
+                <h3>AI-Powered Counselor Priority Matching</h3>
+                <p className="demo-vision-description">
+                  Leverages our existing risk detection AI to automatically match students with counselors based on
+                  urgency (suicide ideation → immediate), issue type (anxiety, depression, academic stress), and counselor
+                  specialization. Creates a triage system for campus mental health services.
+                </p>
+                <div className="demo-vision-mockup">
+                  <div className="demo-mockup-dashboard">
+                    <div className="demo-dashboard-header">
+                      <h4>🏥 Counselor Dashboard — Priority Queue</h4>
+                    </div>
+                    <div className="demo-priority-list">
+                      <div className="demo-priority-item demo-priority-critical">
+                        <span className="demo-priority-badge">🔴 URGENT</span>
+                        <div className="demo-priority-info">
+                          <strong>Student #847</strong>
+                          <p>Repeated mentions of "hopelessness" + isolation indicators</p>
+                          <p className="demo-priority-match">Best match: Dr. Kim (Crisis Intervention Specialist)</p>
+                        </div>
+                        <button className="demo-priority-btn">Contact Now</button>
+                      </div>
+                      <div className="demo-priority-item demo-priority-high">
+                        <span className="demo-priority-badge">🟡 HIGH</span>
+                        <div className="demo-priority-info">
+                          <strong>Student #623</strong>
+                          <p>Anxiety trends + exam stress patterns</p>
+                          <p className="demo-priority-match">Best match: Sarah Lee (Academic Stress Counselor)</p>
+                        </div>
+                        <button className="demo-priority-btn">Schedule</button>
+                      </div>
+                      <div className="demo-priority-item demo-priority-moderate">
+                        <span className="demo-priority-badge">🟢 MODERATE</span>
+                        <div className="demo-priority-info">
+                          <strong>Student #291</strong>
+                          <p>Mild mood fluctuations, healthy coping</p>
+                          <p className="demo-priority-match">Recommended: Group therapy sessions</p>
+                        </div>
+                        <button className="demo-priority-btn">View Profile</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="demo-vision-tech">
+                  <strong>Tech:</strong> Existing risk detection AI + counselor specialization tagging + priority scoring algorithm
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Scalability Message */}
+            <div className="demo-vision-summary">
+              <h3>🚀 Built for Scale</h3>
+              <p>
+                All these features leverage infrastructure we've <strong>already built</strong>:
+              </p>
+              <ul>
+                <li>✅ Risk detection AI (powers counselor matching)</li>
+                <li>✅ Journal-goal mapping system (enables contextual nudges)</li>
+                <li>✅ Conversation history storage (fuels RAG-based calendar integration)</li>
+                <li>✅ User privacy controls (allow students to opt in/out of counselor access)</li>
+              </ul>
+              <p>
+                <strong>This isn't speculative — it's the natural evolution of what we've proven works.</strong>
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Enhanced Market Research Section */}
       <section className="demo-section demo-market-section">
         <div className="demo-container">
@@ -681,19 +822,42 @@ const DemoLanding = () => {
               Source: Visual Capitalist, 2025 — "Therapy & Companionship" ranked #1 among AI use cases
             </p>
 
-            {/* Market Size */}
+            {/* Market Size & Journaling Research */}
             <div className="demo-market-stats">
               <div className="demo-market-stat">
-                <div className="demo-market-stat-number">$4.8B</div>
-                <div className="demo-market-stat-label">Mental Wellness Apps Market (2024)</div>
+                <div className="demo-market-stat-number">83%</div>
+                <div className="demo-market-stat-label">Report better emotional clarity through journaling</div>
+                <div className="demo-market-source">Source: University of Texas at Austin, 2023</div>
               </div>
               <div className="demo-market-stat">
-                <div className="demo-market-stat-number">20%+</div>
-                <div className="demo-market-stat-label">Annual Growth Rate (CAGR)</div>
+                <div className="demo-market-stat-number">28%</div>
+                <div className="demo-market-stat-label">Reduction in anxiety symptoms through regular journaling</div>
+                <div className="demo-market-source">Source: Cambridge University Research, 2023</div>
               </div>
               <div className="demo-market-stat">
-                <div className="demo-market-stat-number">87M+</div>
-                <div className="demo-market-stat-label">Global Users of Mental Health Apps</div>
+                <div className="demo-market-stat-number">$600M</div>
+                <div className="demo-market-stat-label">Digital Journaling Market Size (2024)</div>
+                <div className="demo-market-source">Source: Grand View Research, 2024</div>
+              </div>
+            </div>
+
+            {/* Why Journaling Works */}
+            <h3 className="demo-subsection-title">Why Journaling Works</h3>
+            <div className="demo-journaling-benefits">
+              <div className="demo-benefit-card">
+                <div className="demo-benefit-icon">🧠</div>
+                <h4>Enhances Self-Awareness</h4>
+                <p>Writing about emotions helps identify patterns in thoughts and behaviors, leading to better emotional regulation.</p>
+              </div>
+              <div className="demo-benefit-card">
+                <div className="demo-benefit-icon">💭</div>
+                <h4>Reduces Intrusive Thoughts</h4>
+                <p>Expressive writing decreases rumination by externalizing worries, freeing mental resources for problem-solving.</p>
+              </div>
+              <div className="demo-benefit-card">
+                <div className="demo-benefit-icon">🎯</div>
+                <h4>Strengthens Goal Achievement</h4>
+                <p>Reflecting on daily actions creates accountability loops, increasing goal completion rates by up to 42%.</p>
               </div>
             </div>
 
@@ -868,6 +1032,19 @@ const DemoLanding = () => {
                     <li>International expansion</li>
                   </ul>
                 </div>
+                <div className="demo-roadmap-item demo-roadmap-highlight">
+                  <div className="demo-roadmap-quarter">Q3-Q4 2026</div>
+                  <div className="demo-roadmap-milestone">🚀 AI Companion & Counselor Matching</div>
+                  <ul>
+                    <li>Launch Calendar RAG integration (proactive check-ins)</li>
+                    <li>AI-initiated conversations via push notifications</li>
+                    <li>Goal-aligned emotional nudges system</li>
+                    <li>AI-powered counselor priority matching for mental health services</li>
+                  </ul>
+                  <div className="demo-roadmap-note">
+                    <strong>💡 Scalability Note:</strong> Builds on existing infrastructure (risk detection AI, journal-goal mapping, conversation storage)
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -903,98 +1080,6 @@ const DemoLanding = () => {
                     <p>Incentivize user growth through sharing</p>
                   </div>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Contact & Feedback Section */}
-      <section className="demo-section demo-contact-section">
-        <div className="demo-container">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="demo-section-title">Get in Touch</h2>
-            <p className="demo-section-subtitle">
-              We'd love to hear your feedback and answer your questions
-            </p>
-
-            <div className="demo-contact-grid">
-              {/* Contact Info */}
-              <div className="demo-contact-info">
-                <h3>Contact Information</h3>
-                <div className="demo-contact-item">
-                  <span className="demo-contact-icon">📧</span>
-                  <div>
-                    <strong>Email</strong>
-                    <p>reflecta.team@gmail.com</p>
-                  </div>
-                </div>
-                <div className="demo-contact-item">
-                  <span className="demo-contact-icon">🌐</span>
-                  <div>
-                    <strong>Website</strong>
-                    <p>aidiary-reflecta.vercel.app</p>
-                  </div>
-                </div>
-                <div className="demo-contact-item">
-                  <span className="demo-contact-icon">💬</span>
-                  <div>
-                    <strong>Social Media</strong>
-                    <p>Follow us for updates and mental wellness tips</p>
-                  </div>
-                </div>
-
-                <div className="demo-social-links">
-                  <a href="#" className="demo-social-link" title="Twitter">🐦</a>
-                  <a href="#" className="demo-social-link" title="LinkedIn">💼</a>
-                  <a href="#" className="demo-social-link" title="Instagram">📸</a>
-                  <a href="https://github.com/yourusername/reflecta" className="demo-social-link" title="GitHub">💻</a>
-                </div>
-              </div>
-
-              {/* Feedback Form */}
-              <div className="demo-feedback-form">
-                <h3>Send Us Feedback</h3>
-                <form className="demo-form">
-                  <div className="demo-form-group">
-                    <label htmlFor="demo-name">Name</label>
-                    <input
-                      type="text"
-                      id="demo-name"
-                      className="demo-input"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div className="demo-form-group">
-                    <label htmlFor="demo-email">Email</label>
-                    <input
-                      type="email"
-                      id="demo-email"
-                      className="demo-input"
-                      placeholder="your.email@example.com"
-                    />
-                  </div>
-                  <div className="demo-form-group">
-                    <label htmlFor="demo-message">Message</label>
-                    <textarea
-                      id="demo-message"
-                      className="demo-textarea"
-                      rows="5"
-                      placeholder="Share your thoughts, questions, or feedback..."
-                    ></textarea>
-                  </div>
-                  <button type="submit" className="demo-submit-btn">
-                    Send Message ✉️
-                  </button>
-                </form>
-                <p className="demo-form-note">
-                  <strong>Note:</strong> This is a demo form. For actual inquiries, please email us directly.
-                </p>
               </div>
             </div>
           </motion.div>
