@@ -458,8 +458,7 @@ const Dashboard = () => {
             icon: "💡",
             title: "Goal Detail Modal Opens",
             description: "Watch as we automatically open the first sub-goal's detail modal! This shows AI progress analysis, distinctive word clouds (words unique to that goal), and all related journal entries. This is where goal mapping pays off!",
-            selector: ".modal-overlay",
-            waitForElement: true,
+            selector: null,
           },
           {
             icon: "📝",

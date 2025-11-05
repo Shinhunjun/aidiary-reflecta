@@ -209,25 +209,25 @@ const Chat = () => {
       }, 300);
     }
 
-    // Step 2 or later: Close persona selector if open
-    if (currentTourStep.stepIndex >= 2 && showPersonaSelector) {
-      console.log('[Chat Tour] Step 2+ - Auto-closing persona selector...');
+    // Step 3 or later: Close persona selector if open (after "Meet Your Personas" step 2)
+    if (currentTourStep.stepIndex >= 3 && showPersonaSelector) {
+      console.log('[Chat Tour] Step 3+ - Auto-closing persona selector...');
       setTimeout(() => {
         setShowPersonaSelector(false);
       }, 300);
     }
 
-    // Step 4: Auto-enable selection mode (UPDATED from step 5 after removing step 3)
-    if (currentTourStep.stepIndex === 4 && !isSelectMode) {
-      console.log('[Chat Tour] Step 4 - Auto-enabling selection mode...');
+    // Step 5: Auto-enable selection mode
+    if (currentTourStep.stepIndex === 5 && !isSelectMode) {
+      console.log('[Chat Tour] Step 5 - Auto-enabling selection mode...');
       setTimeout(() => {
         setIsSelectMode(true);
       }, 300);
     }
 
-    // Step 5: Auto-select first 2 user messages (UPDATED from step 6)
-    if (currentTourStep.stepIndex === 5 && isSelectMode && selectedMessages.length === 0) {
-      console.log('[Chat Tour] Step 5 - Auto-selecting messages...');
+    // Step 6: Auto-select first 2 user messages
+    if (currentTourStep.stepIndex === 6 && isSelectMode && selectedMessages.length === 0) {
+      console.log('[Chat Tour] Step 6 - Auto-selecting messages...');
       setTimeout(() => {
         const userMessages = messages.filter(m => m.sender === 'user');
         console.log('[Chat Tour] Found user messages:', userMessages.length);
@@ -238,9 +238,9 @@ const Chat = () => {
       }, 300);
     }
 
-    // Step 6: Auto-click "Convert to Diary" button (UPDATED from step 7)
-    if (currentTourStep.stepIndex === 6 && selectedMessages.length > 0 && !showDiaryModal) {
-      console.log('[Chat Tour] Step 6 - Auto-clicking Convert to Diary button...');
+    // Step 7: Auto-click "Convert to Diary" button
+    if (currentTourStep.stepIndex === 7 && selectedMessages.length > 0 && !showDiaryModal) {
+      console.log('[Chat Tour] Step 7 - Auto-clicking Convert to Diary button...');
       setTimeout(() => {
         // Find and click the convert button
         const convertButton = document.querySelector('.convert-button');
@@ -253,12 +253,12 @@ const Chat = () => {
       }, 500);
     }
 
-    // Step 7: Diary modal should be open (modal opens from convert button click)
-    // No action needed - modal opened by button click in step 6
+    // Step 8: Diary modal should be open (modal opens from convert button click)
+    // No action needed - modal opened by button click in step 7
 
-    // Step 9 or later: Close diary modal if open (UPDATED from step 10)
-    if (currentTourStep.stepIndex >= 9 && showDiaryModal) {
-      console.log('[Chat Tour] Step 9+ - Auto-closing diary modal...');
+    // Step 11 or later: Close diary modal if open (after "Save to Database" step 10)
+    if (currentTourStep.stepIndex >= 11 && showDiaryModal) {
+      console.log('[Chat Tour] Step 11+ - Auto-closing diary modal...');
       setTimeout(() => {
         setShowDiaryModal(false);
         clearSelection();
@@ -718,7 +718,7 @@ const Chat = () => {
       <PageTour
         page="chat"
         navigateToNext="dashboard"
-        pageTotalSteps={11}
+        pageTotalSteps={12}
         pageStartStep={9}
         steps={[
           {
@@ -730,8 +730,14 @@ const Chat = () => {
           {
             icon: "🎭",
             title: "Choose Your AI Companion",
-            description: "Click the persona button to select which AI companion you'd like to chat with. Each persona has a unique personality and communication style. Try 'Growth Mentor' for motivational support or 'Empathetic Listener' for emotional validation!",
+            description: "Click the persona button to select which AI companion you'd like to chat with. Each persona has a unique personality and communication style.",
             selector: ".control-button.persona-button",
+          },
+          {
+            icon: "👥",
+            title: "Meet Your Personas",
+            description: "Watch as the persona selection modal opens! You can choose from 'Growth Mentor' for motivational support, 'Empathetic Listener' for emotional validation, 'Thoughtful Guide' for balanced reflection, or 'Analytical Coach' for structured thinking.",
+            selector: null,
           },
           {
             icon: "✍️",
@@ -775,14 +781,15 @@ const Chat = () => {
             icon: "🎯",
             title: "Automatic Goal Mapping",
             description: "Here's the magic: our AI automatically analyzes your journal entry and links it to relevant goals from your Mandalart! It identifies which sub-goals and tasks your reflection relates to. This connection powers all your progress insights.",
-            selector: ".mapped-goals",
+            selector: ".diary-textarea",
             waitForElement: true,
           },
           {
             icon: "💾",
             title: "Save to Database",
             description: "Click 'Save to Journal' and your entry is permanently stored with all its goal mappings! It becomes part of your reflection history and contributes to AI-generated summaries, word clouds, and progress analytics.",
-            selector: null,
+            selector: ".save-button",
+            waitForElement: true,
           },
           {
             icon: "📊",
