@@ -999,20 +999,20 @@ const DemoLanding = () => {
             <div className="demo-roadmap">
               <h3 className="demo-subsection-title">2025-2026 Roadmap</h3>
               <div className="demo-roadmap-timeline">
-                <div className="demo-roadmap-item">
+                <div className="demo-roadmap-item demo-roadmap-highlight">
                   <div className="demo-roadmap-quarter">Q1 2025</div>
-                  <div className="demo-roadmap-milestone">Beta Launch & User Feedback</div>
+                  <div className="demo-roadmap-milestone">🚀 Beta Launch & AI Features</div>
                   <ul>
                     <li>Public beta with 1,000 users</li>
-                    <li>Iterate based on feedback</li>
-                    <li>Refine AI personas</li>
+                    <li>Launch proactive AI companion (calendar integration, push notifications)</li>
+                    <li>Implement counselor priority matching</li>
                   </ul>
                 </div>
                 <div className="demo-roadmap-item">
                   <div className="demo-roadmap-quarter">Q2 2025</div>
                   <div className="demo-roadmap-milestone">Premium Launch & Marketing</div>
                   <ul>
-                    <li>Launch premium tier</li>
+                    <li>Launch premium tier & ad-supported free tier</li>
                     <li>Social media campaigns</li>
                     <li>Partner with influencers</li>
                   </ul>
@@ -1022,8 +1022,8 @@ const DemoLanding = () => {
                   <div className="demo-roadmap-milestone">Enterprise Pilot Program</div>
                   <ul>
                     <li>Onboard 5-10 universities</li>
-                    <li>Build counselor features</li>
                     <li>HIPAA compliance</li>
+                    <li>Expand counselor features</li>
                   </ul>
                 </div>
                 <div className="demo-roadmap-item">
@@ -1034,19 +1034,6 @@ const DemoLanding = () => {
                     <li>Mobile app (iOS/Android)</li>
                     <li>International expansion</li>
                   </ul>
-                </div>
-                <div className="demo-roadmap-item demo-roadmap-highlight">
-                  <div className="demo-roadmap-quarter">Q3-Q4 2026</div>
-                  <div className="demo-roadmap-milestone">🚀 AI Companion & Counselor Matching</div>
-                  <ul>
-                    <li>Launch Calendar RAG integration (proactive check-ins)</li>
-                    <li>AI-initiated conversations via push notifications</li>
-                    <li>Goal-aligned emotional nudges system</li>
-                    <li>AI-powered counselor priority matching for mental health services</li>
-                  </ul>
-                  <div className="demo-roadmap-note">
-                    <strong>💡 Scalability Note:</strong> Builds on existing infrastructure (risk detection AI, journal-goal mapping, conversation storage)
-                  </div>
                 </div>
               </div>
             </div>
