@@ -220,6 +220,80 @@ const DemoLanding = () => {
         </div>
       </section>
 
+      {/* Team Section */}
+      <section className="demo-section demo-team-section">
+        <div className="demo-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="demo-section-title">Meet Our Team</h2>
+            <p className="demo-section-subtitle">
+              AI & HCI experts building the future of personal growth
+            </p>
+
+            <div className="demo-team-grid">
+              <motion.div
+                className="demo-team-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <div className="demo-team-avatar">👨‍💻</div>
+                <h3>Hunjun Sin</h3>
+                <div className="demo-team-role">Lead Developer & AI Engineer</div>
+                <p className="demo-team-bio">
+                  Full-stack developer specializing in AI integration and user experience design.
+                  Passionate about using technology to support mental wellness.
+                </p>
+              </motion.div>
+
+              <motion.div
+                className="demo-team-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <div className="demo-team-avatar">🧠</div>
+                <h3>HCI Research Team</h3>
+                <div className="demo-team-role">UX Research & Psychology</div>
+                <p className="demo-team-bio">
+                  Human-Computer Interaction specialists researching emotional AI and
+                  conversational interfaces for personal growth applications.
+                </p>
+              </motion.div>
+
+              <motion.div
+                className="demo-team-card"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <div className="demo-team-avatar">🎯</div>
+                <h3>Product Strategy</h3>
+                <div className="demo-team-role">Mental Health & Goal Science</div>
+                <p className="demo-team-bio">
+                  Combining evidence-based psychology with proven goal-setting frameworks
+                  like Mandalart to create structured growth pathways.
+                </p>
+              </motion.div>
+            </div>
+
+            <div className="demo-team-expertise">
+              <div className="demo-expertise-badge">🚀 AI/ML Development</div>
+              <div className="demo-expertise-badge">🎨 UX/UI Design</div>
+              <div className="demo-expertise-badge">🧠 Psychology Research</div>
+              <div className="demo-expertise-badge">📊 Data Analytics</div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Problem → Solution Section */}
       <section className="demo-section demo-problem-solution">
         <div className="demo-container">
@@ -374,6 +448,172 @@ const DemoLanding = () => {
         </div>
       </section>
 
+      {/* User Journey & System Architecture Section */}
+      <section className="demo-section demo-journey-section">
+        <div className="demo-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="demo-section-title">How It Works: User Journey</h2>
+
+            {/* User Flow Diagram */}
+            <div className="demo-user-flow">
+              <div className="demo-flow-step">
+                <div className="demo-flow-number">1</div>
+                <div className="demo-flow-icon">✨</div>
+                <h4>Sign Up & Set Goals</h4>
+                <p>Create account and build your Mandalart goal matrix</p>
+              </div>
+
+              <div className="demo-flow-arrow">→</div>
+
+              <div className="demo-flow-step">
+                <div className="demo-flow-number">2</div>
+                <div className="demo-flow-icon">💬</div>
+                <h4>Chat with AI</h4>
+                <p>Select a persona and have natural conversations</p>
+              </div>
+
+              <div className="demo-flow-arrow">→</div>
+
+              <div className="demo-flow-step">
+                <div className="demo-flow-number">3</div>
+                <div className="demo-flow-icon">📝</div>
+                <h4>Convert to Journal</h4>
+                <p>AI transforms chat into structured diary entries</p>
+              </div>
+
+              <div className="demo-flow-arrow">→</div>
+
+              <div className="demo-flow-step">
+                <div className="demo-flow-number">4</div>
+                <div className="demo-flow-icon">🎯</div>
+                <h4>Auto Goal Mapping</h4>
+                <p>Entries linked to your Mandalart goals automatically</p>
+              </div>
+
+              <div className="demo-flow-arrow">→</div>
+
+              <div className="demo-flow-step">
+                <div className="demo-flow-number">5</div>
+                <div className="demo-flow-icon">📊</div>
+                <h4>View Analytics</h4>
+                <p>Track progress, mood trends, and AI insights</p>
+              </div>
+            </div>
+
+            {/* System Architecture */}
+            <div className="demo-architecture">
+              <h3 className="demo-subsection-title">System Architecture</h3>
+              <div className="demo-architecture-diagram">
+                <div className="demo-arch-layer">
+                  <div className="demo-arch-title">Frontend Layer</div>
+                  <div className="demo-arch-boxes">
+                    <div className="demo-arch-box">
+                      <strong>React + Framer Motion</strong>
+                      <p>Interactive UI with smooth animations</p>
+                    </div>
+                    <div className="demo-arch-box">
+                      <strong>Context API</strong>
+                      <p>State management for auth & journals</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="demo-arch-connector">↓</div>
+
+                <div className="demo-arch-layer">
+                  <div className="demo-arch-title">API Layer</div>
+                  <div className="demo-arch-boxes">
+                    <div className="demo-arch-box">
+                      <strong>Node.js + Express</strong>
+                      <p>RESTful API with JWT authentication</p>
+                    </div>
+                    <div className="demo-arch-box">
+                      <strong>OpenAI Integration</strong>
+                      <p>GPT-4 for chat, analysis, summaries</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="demo-arch-connector">↓</div>
+
+                <div className="demo-arch-layer">
+                  <div className="demo-arch-title">Data Layer</div>
+                  <div className="demo-arch-boxes">
+                    <div className="demo-arch-box">
+                      <strong>MongoDB</strong>
+                      <p>User data, goals, journals, analytics</p>
+                    </div>
+                    <div className="demo-arch-box">
+                      <strong>7-Day Caching</strong>
+                      <p>Reduce API costs for summaries</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Key Features Storyboard */}
+            <div className="demo-storyboard">
+              <h3 className="demo-subsection-title">Feature Storyboard</h3>
+              <div className="demo-storyboard-grid">
+                <div className="demo-storyboard-frame">
+                  <div className="demo-frame-header">Scene 1: New User</div>
+                  <div className="demo-frame-visual">
+                    <div className="demo-frame-icon">👤</div>
+                    <p>"I want to achieve my dreams but don't know where to start"</p>
+                  </div>
+                </div>
+
+                <div className="demo-storyboard-frame">
+                  <div className="demo-frame-header">Scene 2: Mandalart</div>
+                  <div className="demo-frame-visual">
+                    <div className="demo-frame-icon">🎯</div>
+                    <p>Creates 9x9 goal matrix: 1 core goal → 8 sub-goals → 64 tasks</p>
+                  </div>
+                </div>
+
+                <div className="demo-storyboard-frame">
+                  <div className="demo-frame-header">Scene 3: Daily Chat</div>
+                  <div className="demo-frame-visual">
+                    <div className="demo-frame-icon">💬</div>
+                    <p>Chats with "Goal Coach" persona about today's challenges</p>
+                  </div>
+                </div>
+
+                <div className="demo-storyboard-frame">
+                  <div className="demo-frame-header">Scene 4: Auto Diary</div>
+                  <div className="demo-frame-visual">
+                    <div className="demo-frame-icon">📝</div>
+                    <p>Converts chat to structured entry with mood & goal tags</p>
+                  </div>
+                </div>
+
+                <div className="demo-storyboard-frame">
+                  <div className="demo-frame-header">Scene 5: Insights</div>
+                  <div className="demo-frame-visual">
+                    <div className="demo-frame-icon">📊</div>
+                    <p>Views dashboard: "You're 60% complete on Fitness sub-goal!"</p>
+                  </div>
+                </div>
+
+                <div className="demo-storyboard-frame">
+                  <div className="demo-frame-header">Scene 6: Achievement</div>
+                  <div className="demo-frame-visual">
+                    <div className="demo-frame-icon">🎉</div>
+                    <p>30 days later: "I'm making real progress toward my dreams"</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ELIZA Effect Section */}
       <section className="demo-section demo-eliza-section">
         <div className="demo-container">
@@ -409,8 +649,8 @@ const DemoLanding = () => {
         </div>
       </section>
 
-      {/* 2025 AI Trend Section */}
-      <section className="demo-section demo-trend-section">
+      {/* Enhanced Market Research Section */}
+      <section className="demo-section demo-market-section">
         <div className="demo-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -418,8 +658,9 @@ const DemoLanding = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="demo-section-title">AI is Evolving: Creation → Support</h2>
+            <h2 className="demo-section-title">Market Opportunity</h2>
 
+            {/* AI Trend Evolution */}
             <div className="demo-trend-comparison">
               <div className="demo-trend-year">
                 <div className="demo-trend-label">2024</div>
@@ -440,10 +681,322 @@ const DemoLanding = () => {
               Source: Visual Capitalist, 2025 — "Therapy & Companionship" ranked #1 among AI use cases
             </p>
 
-            <p className="demo-trend-message">
-              Reflecta is at the center of this transformation, combining AI companionship
-              with structured goal achievement.
+            {/* Market Size */}
+            <div className="demo-market-stats">
+              <div className="demo-market-stat">
+                <div className="demo-market-stat-number">$4.8B</div>
+                <div className="demo-market-stat-label">Mental Wellness Apps Market (2024)</div>
+              </div>
+              <div className="demo-market-stat">
+                <div className="demo-market-stat-number">20%+</div>
+                <div className="demo-market-stat-label">Annual Growth Rate (CAGR)</div>
+              </div>
+              <div className="demo-market-stat">
+                <div className="demo-market-stat-number">87M+</div>
+                <div className="demo-market-stat-label">Global Users of Mental Health Apps</div>
+              </div>
+            </div>
+
+            {/* Competitor Comparison */}
+            <h3 className="demo-subsection-title">How We're Different</h3>
+            <div className="demo-competitor-table">
+              <div className="demo-competitor-row demo-competitor-header">
+                <div className="demo-competitor-col">Feature</div>
+                <div className="demo-competitor-col">Notion</div>
+                <div className="demo-competitor-col">Day One</div>
+                <div className="demo-competitor-col">Headspace</div>
+                <div className="demo-competitor-col demo-competitor-reflecta">Reflecta</div>
+              </div>
+              <div className="demo-competitor-row">
+                <div className="demo-competitor-col">AI Chat Personas</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col demo-competitor-reflecta">✅ 6+ Custom</div>
+              </div>
+              <div className="demo-competitor-row">
+                <div className="demo-competitor-col">Goal Framework</div>
+                <div className="demo-competitor-col">Basic</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col demo-competitor-reflecta">✅ Mandalart</div>
+              </div>
+              <div className="demo-competitor-row">
+                <div className="demo-competitor-col">Auto Diary Conversion</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col demo-competitor-reflecta">✅ AI-Powered</div>
+              </div>
+              <div className="demo-competitor-row">
+                <div className="demo-competitor-col">Goal-Journal Mapping</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col demo-competitor-reflecta">✅ Automatic</div>
+              </div>
+              <div className="demo-competitor-row">
+                <div className="demo-competitor-col">Mental Health Monitoring</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">❌</div>
+                <div className="demo-competitor-col">Basic</div>
+                <div className="demo-competitor-col demo-competitor-reflecta">✅ AI + Counselor</div>
+              </div>
+            </div>
+
+            <div className="demo-differentiation-message">
+              <strong>Our Unique Value:</strong> Reflecta is the only platform that combines conversational AI,
+              structured goal-setting (Mandalart), automated journaling, and professional mental health support
+              in one integrated system.
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Business Strategy Section */}
+      <section className="demo-section demo-business-section">
+        <div className="demo-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="demo-section-title">Business Strategy</h2>
+
+            {/* Target Users */}
+            <div className="demo-target-users">
+              <h3 className="demo-subsection-title">Target User Personas</h3>
+              <div className="demo-persona-grid">
+                <div className="demo-persona-card">
+                  <div className="demo-persona-icon">🎓</div>
+                  <h4>Students & Young Professionals</h4>
+                  <p>Ages 18-30 seeking structured goal-setting and mental health support during transitions</p>
+                  <div className="demo-persona-stat">Primary Market: 45M users globally</div>
+                </div>
+                <div className="demo-persona-card">
+                  <div className="demo-persona-icon">💼</div>
+                  <h4>Working Professionals</h4>
+                  <p>Ages 25-45 managing stress, career goals, and work-life balance</p>
+                  <div className="demo-persona-stat">Secondary Market: 30M users globally</div>
+                </div>
+                <div className="demo-persona-card">
+                  <div className="demo-persona-icon">🏫</div>
+                  <h4>Educational Institutions</h4>
+                  <p>Universities and schools providing mental health resources to students</p>
+                  <div className="demo-persona-stat">Enterprise Market: 5,000+ institutions</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Monetization Strategy */}
+            <div className="demo-monetization">
+              <h3 className="demo-subsection-title">Monetization Model</h3>
+              <div className="demo-pricing-tiers">
+                <div className="demo-pricing-card">
+                  <div className="demo-pricing-badge">Free</div>
+                  <div className="demo-pricing-price">$0</div>
+                  <ul className="demo-pricing-features">
+                    <li>✓ Basic journaling</li>
+                    <li>✓ 2 AI personas</li>
+                    <li>✓ Mandalart goal-setting</li>
+                    <li>✓ Limited AI chats (10/month)</li>
+                  </ul>
+                </div>
+                <div className="demo-pricing-card demo-pricing-featured">
+                  <div className="demo-pricing-badge">Premium</div>
+                  <div className="demo-pricing-price">$9.99<span>/mo</span></div>
+                  <ul className="demo-pricing-features">
+                    <li>✓ Unlimited AI chats</li>
+                    <li>✓ All 6 personas + custom</li>
+                    <li>✓ Advanced analytics</li>
+                    <li>✓ AI insights & summaries</li>
+                    <li>✓ Export & backup</li>
+                  </ul>
+                </div>
+                <div className="demo-pricing-card">
+                  <div className="demo-pricing-badge">Enterprise</div>
+                  <div className="demo-pricing-price">Custom</div>
+                  <ul className="demo-pricing-features">
+                    <li>✓ Counselor dashboard</li>
+                    <li>✓ Student risk monitoring</li>
+                    <li>✓ Admin controls</li>
+                    <li>✓ Bulk licensing</li>
+                    <li>✓ Custom integrations</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Growth Roadmap */}
+            <div className="demo-roadmap">
+              <h3 className="demo-subsection-title">2025-2026 Roadmap</h3>
+              <div className="demo-roadmap-timeline">
+                <div className="demo-roadmap-item">
+                  <div className="demo-roadmap-quarter">Q1 2025</div>
+                  <div className="demo-roadmap-milestone">Beta Launch & User Feedback</div>
+                  <ul>
+                    <li>Public beta with 1,000 users</li>
+                    <li>Iterate based on feedback</li>
+                    <li>Refine AI personas</li>
+                  </ul>
+                </div>
+                <div className="demo-roadmap-item">
+                  <div className="demo-roadmap-quarter">Q2 2025</div>
+                  <div className="demo-roadmap-milestone">Premium Launch & Marketing</div>
+                  <ul>
+                    <li>Launch premium tier</li>
+                    <li>Social media campaigns</li>
+                    <li>Partner with influencers</li>
+                  </ul>
+                </div>
+                <div className="demo-roadmap-item">
+                  <div className="demo-roadmap-quarter">Q3 2025</div>
+                  <div className="demo-roadmap-milestone">Enterprise Pilot Program</div>
+                  <ul>
+                    <li>Onboard 5-10 universities</li>
+                    <li>Build counselor features</li>
+                    <li>HIPAA compliance</li>
+                  </ul>
+                </div>
+                <div className="demo-roadmap-item">
+                  <div className="demo-roadmap-quarter">Q4 2025 - Q2 2026</div>
+                  <div className="demo-roadmap-milestone">Scale & Expand</div>
+                  <ul>
+                    <li>Reach 50,000 active users</li>
+                    <li>Mobile app (iOS/Android)</li>
+                    <li>International expansion</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Marketing Channels */}
+            <div className="demo-marketing">
+              <h3 className="demo-subsection-title">Go-to-Market Channels</h3>
+              <div className="demo-marketing-channels">
+                <div className="demo-marketing-channel">
+                  <span className="demo-marketing-icon">📱</span>
+                  <div>
+                    <strong>Social Media</strong>
+                    <p>TikTok, Instagram for student demographics</p>
+                  </div>
+                </div>
+                <div className="demo-marketing-channel">
+                  <span className="demo-marketing-icon">🎓</span>
+                  <div>
+                    <strong>University Partnerships</strong>
+                    <p>Mental health centers, career services</p>
+                  </div>
+                </div>
+                <div className="demo-marketing-channel">
+                  <span className="demo-marketing-icon">💬</span>
+                  <div>
+                    <strong>Content Marketing</strong>
+                    <p>Blog, YouTube on goal-setting & mental wellness</p>
+                  </div>
+                </div>
+                <div className="demo-marketing-channel">
+                  <span className="demo-marketing-icon">🤝</span>
+                  <div>
+                    <strong>Referral Program</strong>
+                    <p>Incentivize user growth through sharing</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Contact & Feedback Section */}
+      <section className="demo-section demo-contact-section">
+        <div className="demo-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="demo-section-title">Get in Touch</h2>
+            <p className="demo-section-subtitle">
+              We'd love to hear your feedback and answer your questions
             </p>
+
+            <div className="demo-contact-grid">
+              {/* Contact Info */}
+              <div className="demo-contact-info">
+                <h3>Contact Information</h3>
+                <div className="demo-contact-item">
+                  <span className="demo-contact-icon">📧</span>
+                  <div>
+                    <strong>Email</strong>
+                    <p>reflecta.team@gmail.com</p>
+                  </div>
+                </div>
+                <div className="demo-contact-item">
+                  <span className="demo-contact-icon">🌐</span>
+                  <div>
+                    <strong>Website</strong>
+                    <p>aidiary-reflecta.vercel.app</p>
+                  </div>
+                </div>
+                <div className="demo-contact-item">
+                  <span className="demo-contact-icon">💬</span>
+                  <div>
+                    <strong>Social Media</strong>
+                    <p>Follow us for updates and mental wellness tips</p>
+                  </div>
+                </div>
+
+                <div className="demo-social-links">
+                  <a href="#" className="demo-social-link" title="Twitter">🐦</a>
+                  <a href="#" className="demo-social-link" title="LinkedIn">💼</a>
+                  <a href="#" className="demo-social-link" title="Instagram">📸</a>
+                  <a href="https://github.com/yourusername/reflecta" className="demo-social-link" title="GitHub">💻</a>
+                </div>
+              </div>
+
+              {/* Feedback Form */}
+              <div className="demo-feedback-form">
+                <h3>Send Us Feedback</h3>
+                <form className="demo-form">
+                  <div className="demo-form-group">
+                    <label htmlFor="demo-name">Name</label>
+                    <input
+                      type="text"
+                      id="demo-name"
+                      className="demo-input"
+                      placeholder="Your name"
+                    />
+                  </div>
+                  <div className="demo-form-group">
+                    <label htmlFor="demo-email">Email</label>
+                    <input
+                      type="email"
+                      id="demo-email"
+                      className="demo-input"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+                  <div className="demo-form-group">
+                    <label htmlFor="demo-message">Message</label>
+                    <textarea
+                      id="demo-message"
+                      className="demo-textarea"
+                      rows="5"
+                      placeholder="Share your thoughts, questions, or feedback..."
+                    ></textarea>
+                  </div>
+                  <button type="submit" className="demo-submit-btn">
+                    Send Message ✉️
+                  </button>
+                </form>
+                <p className="demo-form-note">
+                  <strong>Note:</strong> This is a demo form. For actual inquiries, please email us directly.
+                </p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
