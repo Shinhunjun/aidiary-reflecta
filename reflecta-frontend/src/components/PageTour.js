@@ -15,6 +15,7 @@ const PageTour = ({
   const [isVisible, setIsVisible] = useState(false);
   const [highlightedElement, setHighlightedElement] = useState(null);
   const [waitingForAction, setWaitingForAction] = useState(false);
+  const [highlightPosition, setHighlightPosition] = useState({ top: 0, left: 0, width: 0, height: 0 });
 
   const {
     tourActive,
@@ -23,6 +24,32 @@ const PageTour = ({
     updateGlobalStep,
     navigateToNextPage
   } = useTour();
+
+  // Update highlight position on scroll and resize
+  useEffect(() => {
+    const updateHighlightPosition = () => {
+      if (highlightedElement) {
+        const rect = highlightedElement.getBoundingClientRect();
+        setHighlightPosition({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
+        });
+      }
+    };
+
+    if (highlightedElement) {
+      updateHighlightPosition();
+      window.addEventListener('scroll', updateHighlightPosition, true);
+      window.addEventListener('resize', updateHighlightPosition);
+
+      return () => {
+        window.removeEventListener('scroll', updateHighlightPosition, true);
+        window.removeEventListener('resize', updateHighlightPosition);
+      };
+    }
+  }, [highlightedElement]);
 
   useEffect(() => {
     // Check if user is demo and tour is active OR hasn't seen this tour
@@ -138,49 +165,9 @@ const PageTour = ({
     if (onComplete) onComplete();
   };
 
-  const getTooltipPosition = () => {
-    if (!highlightedElement) {
-      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
-    }
-
-    const rect = highlightedElement.getBoundingClientRect();
-    const tooltipHeight = 200; // Approximate tooltip height
-    const tooltipWidth = 400; // Approximate tooltip width
-
-    // Try to position tooltip below the element
-    if (rect.bottom + tooltipHeight < window.innerHeight) {
-      return {
-        top: `${rect.bottom + window.scrollY + 20}px`,
-        left: `${rect.left + rect.width / 2}px`,
-        transform: 'translateX(-50%)',
-      };
-    }
-    // Position above if not enough space below
-    else if (rect.top - tooltipHeight > 0) {
-      return {
-        top: `${rect.top + window.scrollY - tooltipHeight - 20}px`,
-        left: `${rect.left + rect.width / 2}px`,
-        transform: 'translateX(-50%)',
-      };
-    }
-    // Position to the right if not enough vertical space
-    else if (rect.right + tooltipWidth < window.innerWidth) {
-      return {
-        top: `${rect.top + window.scrollY + rect.height / 2}px`,
-        left: `${rect.right + 20}px`,
-        transform: 'translateY(-50%)',
-      };
-    }
-    // Default: center screen
-    else {
-      return { top: '50%', left: '50%', transform: 'translate(-50%, -50%)' };
-    }
-  };
-
   if (!isVisible) return null;
 
   const currentStepData = steps[currentStep];
-  const tooltipPosition = getTooltipPosition();
 
   return (
     <>
@@ -188,27 +175,23 @@ const PageTour = ({
       <div className="tour-backdrop" onClick={handleSkip} />
 
       {/* Highlight overlay for specific element */}
-      {highlightedElement && (() => {
-        const rect = highlightedElement.getBoundingClientRect();
-        return (
-          <div
-            className="tour-highlight"
-            style={{
-              top: `${rect.top}px`,
-              left: `${rect.left}px`,
-              width: `${rect.width}px`,
-              height: `${rect.height}px`,
-            }}
-          />
-        );
-      })()}
+      {highlightedElement && (
+        <div
+          className="tour-highlight"
+          style={{
+            top: `${highlightPosition.top}px`,
+            left: `${highlightPosition.left}px`,
+            width: `${highlightPosition.width}px`,
+            height: `${highlightPosition.height}px`,
+          }}
+        />
+      )}
 
       {/* Tooltip */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentStep}
           className="tour-tooltip"
-          style={tooltipPosition}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}

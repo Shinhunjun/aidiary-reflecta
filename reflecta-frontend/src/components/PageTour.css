@@ -32,7 +32,9 @@
 
 /* Tooltip */
 .tour-tooltip {
-  position: absolute;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   border: 2px solid rgba(99, 102, 241, 0.3);
   border-radius: 16px;
@@ -230,10 +232,10 @@
     max-width: 90vw;
     min-width: 280px;
     padding: 20px;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    top: auto !important;
-    bottom: 20px !important;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 10px;
   }
 
   .tour-icon {
