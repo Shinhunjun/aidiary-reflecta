@@ -201,9 +201,9 @@ const Chat = () => {
 
     console.log('[Chat Tour] On correct page, step:', currentTourStep.stepIndex);
 
-    // Step 1: Auto-open persona selector modal
-    if (currentTourStep.stepIndex === 1 && !showPersonaSelector) {
-      console.log('[Chat Tour] Step 1 - Auto-opening persona selector...');
+    // Step 2: Auto-open persona selector modal (after highlighting button in step 1)
+    if (currentTourStep.stepIndex === 2 && !showPersonaSelector) {
+      console.log('[Chat Tour] Step 2 - Auto-opening persona selector...');
       setTimeout(() => {
         setShowPersonaSelector(true);
       }, 300);
@@ -768,7 +768,7 @@ const Chat = () => {
             icon: "📔",
             title: "Convert to Diary",
             description: "Once you've selected messages, click 'Convert to Diary'. Our AI will transform your conversation into a well-structured journal entry with a clear narrative flow. It's like having a personal editor!",
-            selector: ".control-button.convert-button",
+            selector: null,
           },
           {
             icon: "😊",

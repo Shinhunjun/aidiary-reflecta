@@ -1678,8 +1678,7 @@ const GoalSetting = () => {
             icon: "🔍",
             title: "Expand a Sub-Goal",
             description: "Watch as we automatically expand the first sub-goal to show its 8 actionable tasks! This is where you define concrete steps - specific actions like 'Network with industry leaders' or 'Complete certification'. The tour will open this for you automatically.",
-            selector: ".mandalart-overlay-grid",
-            waitForElement: true,
+            selector: null,
           },
           {
             icon: "✅",
