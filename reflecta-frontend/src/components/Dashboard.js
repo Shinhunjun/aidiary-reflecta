@@ -364,12 +364,12 @@ const Dashboard = () => {
                 )}
               </div>
 
-              <div className="dashboard-section">
+              <div className="dashboard-section" id="emotional-journey-section">
                 <h2>💭 Your Emotional Journey</h2>
                 <EmotionalJourneyMap goalId={goalId} />
               </div>
 
-              <div className="dashboard-section">
+              <div className="dashboard-section" id="word-cloud-section">
                 <h2>☁️ Words of Your Journey</h2>
                 <ReflectionWordCloud goalId={goalId} />
               </div>
@@ -432,13 +432,13 @@ const Dashboard = () => {
             icon: "💭",
             title: "Emotional Journey",
             description: "This chart visualizes your mood patterns over time. See how your emotional state fluctuates as you work toward your goals. Notice correlations between moods and progress - maybe you're happiest when achieving milestones!",
-            selector: ".dashboard-section",
+            selector: "#emotional-journey-section",
           },
           {
             icon: "☁️",
             title: "Words of Your Journey",
             description: "Two word clouds compare your vocabulary: 'All Time' shows words from all entries, 'Last 3 Months' shows recent themes. Notice how your focus evolves! Toggle between views to see what's consistent vs. what's changing.",
-            selector: ".dashboard-section",
+            selector: "#word-cloud-section",
           },
           {
             icon: "🔍",

@@ -85,9 +85,12 @@ const PageTour = ({
       const checkElement = () => {
         const element = document.querySelector(step.selector);
         if (element) {
-          setHighlightedElement(element);
-          // Scroll element into view smoothly
+          // Scroll element into view smoothly first
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Wait for scroll animation to complete before setting highlight
+          setTimeout(() => {
+            setHighlightedElement(element);
+          }, 600); // 600ms to allow smooth scroll to complete
         } else if (step.waitForElement) {
           // Retry after a short delay if element should appear
           setTimeout(checkElement, 200);
