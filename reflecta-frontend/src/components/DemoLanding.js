@@ -491,7 +491,7 @@ const DemoLanding = () => {
                   <div className="demo-frame-header">Scene 1: New User</div>
                   <div className="demo-frame-visual">
                     <div className="demo-frame-icon">👤</div>
-                    <p>"I want to achieve my dreams but don't know where to start"</p>
+                    <p>"I want to achieve my dreams but I always give up on traditional journaling. It feels like a chore to write every day."</p>
                   </div>
                 </div>
 
@@ -514,7 +514,7 @@ const DemoLanding = () => {
                 <div className="demo-storyboard-frame">
                   <div className="demo-frame-header">Scene 4: Auto Diary</div>
                   <div className="demo-frame-visual">
-                    <div className="demo-frame-icon">📝</div>
+                    <div className="demo-frame-icon">💬 → 📔</div>
                     <p>Converts chat to structured entry with mood & goal tags</p>
                   </div>
                 </div>
@@ -958,19 +958,21 @@ const DemoLanding = () => {
               <h3 className="demo-subsection-title">Monetization Model</h3>
               <div className="demo-pricing-tiers">
                 <div className="demo-pricing-card">
-                  <div className="demo-pricing-badge">Free</div>
+                  <div className="demo-pricing-badge">Free (Ad-Supported)</div>
                   <div className="demo-pricing-price">$0</div>
                   <ul className="demo-pricing-features">
                     <li>✓ Basic journaling</li>
                     <li>✓ 2 AI personas</li>
                     <li>✓ Mandalart goal-setting</li>
                     <li>✓ Limited AI chats (10/month)</li>
+                    <li>⚠️ Non-intrusive ads in sidebar</li>
                   </ul>
                 </div>
                 <div className="demo-pricing-card demo-pricing-featured">
                   <div className="demo-pricing-badge">Premium</div>
                   <div className="demo-pricing-price">$9.99<span>/mo</span></div>
                   <ul className="demo-pricing-features">
+                    <li>✓ Ad-free experience</li>
                     <li>✓ Unlimited AI chats</li>
                     <li>✓ All 6 personas + custom</li>
                     <li>✓ Advanced analytics</li>
@@ -982,6 +984,7 @@ const DemoLanding = () => {
                   <div className="demo-pricing-badge">Enterprise</div>
                   <div className="demo-pricing-price">Custom</div>
                   <ul className="demo-pricing-features">
+                    <li>✓ Ad-free for all users</li>
                     <li>✓ Counselor dashboard</li>
                     <li>✓ Student risk monitoring</li>
                     <li>✓ Admin controls</li>
