@@ -463,23 +463,6 @@ const DemoLanding = () => {
             <div className="demo-final-cta-actions">
               <button
                 className="demo-cta-button demo-cta-primary demo-cta-large"
-                onClick={handleStartDemo}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="demo-spinner"></span>
-                    Logging in...
-                  </>
-                ) : (
-                  <>
-                    🚀 Launch Demo Now
-                  </>
-                )}
-              </button>
-
-              <button
-                className="demo-cta-button demo-cta-secondary demo-cta-large"
                 onClick={handleStartGuidedTour}
                 disabled={isLoading}
               >

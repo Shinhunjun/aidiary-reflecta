@@ -138,6 +138,53 @@ const Chat = () => {
     setIsSelectMode(false);
   };
 
+  // Tour mode: Inject mock conversation data when tour starts
+  useEffect(() => {
+    if (!tourActive || !currentTourStep) return;
+    if (currentTourStep.pageId !== 'chat') return;
+
+    // Only inject once when first entering chat page during tour
+    if (currentTourStep.stepIndex === 0 && messages.length === 1) {
+      console.log('[Chat Tour] Injecting mock conversation data...');
+
+      const mockMessages = [
+        {
+          id: 1,
+          text: "I am Reflecta, your personal reflection assistant. I'm here to help you think through your goals and feelings. What's on your mind today?",
+          sender: "bot",
+          timestamp: new Date(Date.now() - 240000), // 4 minutes ago
+        },
+        {
+          id: 2,
+          text: "I've been thinking about my career goals lately. I want to improve my professional network and learn new skills.",
+          sender: "user",
+          timestamp: new Date(Date.now() - 180000), // 3 minutes ago
+        },
+        {
+          id: 3,
+          text: "That's wonderful that you're focused on career growth! Building a strong network and continuously learning are key to professional development. What specific skills are you interested in developing?",
+          sender: "bot",
+          timestamp: new Date(Date.now() - 120000), // 2 minutes ago
+        },
+        {
+          id: 4,
+          text: "I want to get better at public speaking and also complete my industry certification. I feel like these would really help me advance.",
+          sender: "user",
+          timestamp: new Date(Date.now() - 60000), // 1 minute ago
+        },
+        {
+          id: 5,
+          text: "Those are excellent concrete goals! Public speaking skills will boost your confidence and visibility, while a certification validates your expertise. Have you started taking any steps toward these goals?",
+          sender: "bot",
+          timestamp: new Date(Date.now() - 10000), // 10 seconds ago
+        },
+      ];
+
+      setMessages(mockMessages);
+      console.log('[Chat Tour] Mock conversation loaded:', mockMessages.length, 'messages');
+    }
+  }, [tourActive, currentTourStep, messages.length]);
+
   // Tour mode: Auto-enable selection and show diary modal
   useEffect(() => {
     console.log('[Chat Tour] Effect triggered:', {
@@ -153,11 +200,18 @@ const Chat = () => {
 
     console.log('[Chat Tour] On correct page, step:', currentTourStep.stepIndex);
 
-    // Step 7: Auto-enable selection mode and select first 2 user messages
-    if (currentTourStep.stepIndex === 7 && !isSelectMode) {
-      console.log('[Chat Tour] Step 7 - Auto-enabling selection mode...');
+    // Step 5: Auto-enable selection mode (FIXED from step 7)
+    if (currentTourStep.stepIndex === 5 && !isSelectMode) {
+      console.log('[Chat Tour] Step 5 - Auto-enabling selection mode...');
       setTimeout(() => {
         setIsSelectMode(true);
+      }, 300);
+    }
+
+    // Step 6: Auto-select first 2 user messages
+    if (currentTourStep.stepIndex === 6 && isSelectMode && selectedMessages.length === 0) {
+      console.log('[Chat Tour] Step 6 - Auto-selecting messages...');
+      setTimeout(() => {
         const userMessages = messages.filter(m => m.sender === 'user');
         console.log('[Chat Tour] Found user messages:', userMessages.length);
         if (userMessages.length >= 2) {
@@ -167,32 +221,33 @@ const Chat = () => {
       }, 300);
     }
 
-    // Step 9: Auto-open diary modal with demo content
-    if (currentTourStep.stepIndex === 9 && !showDiaryModal) {
-      console.log('[Chat Tour] Step 9 - Auto-opening diary modal...');
+    // Step 7: Auto-click "Convert to Diary" button
+    if (currentTourStep.stepIndex === 7 && selectedMessages.length > 0 && !showDiaryModal) {
+      console.log('[Chat Tour] Step 7 - Auto-clicking Convert to Diary button...');
       setTimeout(() => {
-        setDiaryContent(
-          "Today was a productive day working on my goals. I had a meaningful conversation with my AI assistant about my career aspirations and personal growth. I realized that breaking down my goals into smaller tasks makes them feel more achievable. I'm excited to see my progress over time!"
-        );
-        setDiaryMood("happy");
-        setGoalMapping({
-          relatedGoalId: "demo-goal-1",
-          confidence: 0.85,
-          goalText: "Career Excellence"
-        });
-        setShowDiaryModal(true);
-      }, 300);
+        // Find and click the convert button
+        const convertButton = document.querySelector('.convert-button');
+        if (convertButton) {
+          console.log('[Chat Tour] Convert button found, clicking...');
+          convertButton.click();
+        } else {
+          console.error('[Chat Tour] Convert button not found!');
+        }
+      }, 500);
     }
 
-    // Step 11 or later: Close diary modal if open
-    if (currentTourStep.stepIndex >= 11 && showDiaryModal) {
-      console.log('[Chat Tour] Step 11+ - Auto-closing diary modal...');
+    // Step 8: Diary modal should be open (modal opens from convert button click)
+    // No action needed - modal opened by button click in step 7
+
+    // Step 10 or later: Close diary modal if open (FIXED from step 11)
+    if (currentTourStep.stepIndex >= 10 && showDiaryModal) {
+      console.log('[Chat Tour] Step 10+ - Auto-closing diary modal...');
       setTimeout(() => {
         setShowDiaryModal(false);
         clearSelection();
       }, 300);
     }
-  }, [tourActive, currentTourStep, messages, isSelectMode, showDiaryModal, clearSelection]);
+  }, [tourActive, currentTourStep, messages, isSelectMode, showDiaryModal, selectedMessages, clearSelection]);
 
   // 대화 초기화 함수
   const resetMessages = () => {
