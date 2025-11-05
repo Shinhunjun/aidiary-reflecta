@@ -1087,10 +1087,11 @@ const DemoLanding = () => {
             className="demo-final-cta-content"
           >
             <h2>Ready to Experience the Future of Personal Growth?</h2>
+            <p className="demo-cta-subtitle">✨ Try our interactive demo — see it in action in just 3 minutes</p>
 
             <div className="demo-final-cta-actions">
               <button
-                className="demo-cta-button demo-cta-primary demo-cta-large"
+                className="demo-cta-button demo-cta-primary demo-cta-large demo-cta-pulse"
                 onClick={handleStartGuidedTour}
                 disabled={isLoading}
               >
@@ -1101,7 +1102,8 @@ const DemoLanding = () => {
                   </>
                 ) : (
                   <>
-                    🎓 Start Guided Tour
+                    <span className="demo-cta-icon">🚀</span>
+                    Try Interactive Demo (3 min)
                   </>
                 )}
               </button>

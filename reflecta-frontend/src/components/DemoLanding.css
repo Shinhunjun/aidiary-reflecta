@@ -755,8 +755,15 @@
 .demo-final-cta-content h2 {
   font-size: 48px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: white;
+}
+
+.demo-cta-subtitle {
+  font-size: 18px;
+  color: #a78bfa;
+  margin-bottom: 40px;
+  font-weight: 500;
 }
 
 .demo-final-cta-content > p {
@@ -772,6 +779,44 @@
   align-items: center;
   flex-wrap: wrap;
   margin-bottom: 20px;
+}
+
+/* CTA Button Pulse Animation */
+.demo-cta-pulse {
+  animation: ctaPulse 2s ease-in-out infinite;
+  position: relative;
+}
+
+@keyframes ctaPulse {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 12px 48px rgba(99, 102, 241, 0.6), 0 0 0 8px rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+.demo-cta-pulse:hover {
+  animation: none;
+  box-shadow: 0 16px 64px rgba(99, 102, 241, 0.5) !important;
+  transform: translateY(-4px) scale(1.02) !important;
+}
+
+.demo-cta-icon {
+  display: inline-block;
+  margin-right: 8px;
+  animation: iconBounce 1s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 .demo-final-note {
@@ -847,6 +892,10 @@
 
   .demo-final-cta-content h2 {
     font-size: 36px;
+  }
+
+  .demo-cta-subtitle {
+    font-size: 16px;
   }
 
   /* Feature Showcase Responsive */
