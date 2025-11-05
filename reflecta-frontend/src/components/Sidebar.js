@@ -2,12 +2,17 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { useSidebar } from "../contexts/SidebarContext";
+import { useTour } from "../contexts/TourContext";
 import "./Sidebar.css";
 
 const Sidebar = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const { isCollapsed, toggleSidebar, isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } = useSidebar();
+  const { currentTourStep } = useTour();
   const navigate = useNavigate();
+
+  // Check if we're on "The Complete Loop" step (Dashboard step 9, which is index 9)
+  const showFlowNumbers = currentTourStep?.pageId === 'dashboard' && currentTourStep?.stepIndex === 9;
 
   const handleLogout = () => {
     logout();
@@ -166,10 +171,11 @@ const Sidebar = () => {
               <NavLink
                 to="/goal-setting"
                 className={({ isActive }) =>
-                  `sidebar-link ${isActive ? "active" : ""}`
+                  `sidebar-link ${isActive ? "active" : ""} ${showFlowNumbers ? "flow-highlight" : ""}`
                 }
                 onClick={handleNavLinkClick}
               >
+                {showFlowNumbers && <span className="flow-number">1</span>}
                 <span className="sidebar-icon">🎯</span>
                 <span className="sidebar-label">Goal</span>
               </NavLink>
@@ -177,27 +183,29 @@ const Sidebar = () => {
 
             <motion.div variants={linkVariants} whileHover="hover">
               <NavLink
-                to="/dashboard"
+                to="/journal"
                 className={({ isActive }) =>
-                  `sidebar-link ${isActive ? "active" : ""}`
+                  `sidebar-link ${isActive ? "active" : ""} ${showFlowNumbers ? "flow-highlight" : ""}`
                 }
                 onClick={handleNavLinkClick}
               >
-                <span className="sidebar-icon">📊</span>
-                <span className="sidebar-label">Dashboard</span>
+                {showFlowNumbers && <span className="flow-number">2</span>}
+                <span className="sidebar-icon">📝</span>
+                <span className="sidebar-label">Journal</span>
               </NavLink>
             </motion.div>
 
             <motion.div variants={linkVariants} whileHover="hover">
               <NavLink
-                to="/journal"
+                to="/dashboard"
                 className={({ isActive }) =>
-                  `sidebar-link ${isActive ? "active" : ""}`
+                  `sidebar-link ${isActive ? "active" : ""} ${showFlowNumbers ? "flow-highlight" : ""}`
                 }
                 onClick={handleNavLinkClick}
               >
-                <span className="sidebar-icon">📝</span>
-                <span className="sidebar-label">Journal</span>
+                {showFlowNumbers && <span className="flow-number">3</span>}
+                <span className="sidebar-icon">📊</span>
+                <span className="sidebar-label">Dashboard</span>
               </NavLink>
             </motion.div>
 
