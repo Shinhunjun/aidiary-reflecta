@@ -9,13 +9,16 @@ const PageTour = ({
   onComplete,
   navigateToNext = null, // Next page to navigate to
   pageTotalSteps = null, // Total steps in this page
-  pageStartStep = 0 // Global step number where this page starts
+  pageStartStep = 0, // Global step number where this page starts
+  automationStates = {} // External component states to monitor (e.g., isLoading, showModal)
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [highlightedElement, setHighlightedElement] = useState(null);
   const [waitingForAction, setWaitingForAction] = useState(false);
+  const [waitingForAutomation, setWaitingForAutomation] = useState(false);
   const [highlightPosition, setHighlightPosition] = useState({ top: 0, left: 0, width: 0, height: 0 });
+  const automationTimeoutRef = React.useRef(null);
 
   const {
     tourActive,
@@ -68,10 +71,33 @@ const PageTour = ({
     }
   }, [page]);
 
+  // Monitor external automation states (e.g., API completion indicators)
+  useEffect(() => {
+    if (currentStep >= steps.length) return;
+
+    const step = steps[currentStep];
+
+    // If this step requires state monitoring and we're waiting for automation
+    if (step.requiresStateMonitoring && waitingForAutomation) {
+      // Check if the monitored state indicates completion
+      // For Chat step 7: check if showDiaryModal is true (diary conversion completed)
+      if (automationStates.showDiaryModal === true) {
+        console.log('[PageTour] State monitoring: showDiaryModal is true, enabling Next button');
+        setWaitingForAutomation(false);
+      }
+    }
+  }, [currentStep, steps, waitingForAutomation, automationStates]);
+
   const highlightStep = (stepIndex) => {
     if (stepIndex >= steps.length) return;
 
     const step = steps[stepIndex];
+
+    // Clear any existing automation timeout
+    if (automationTimeoutRef.current) {
+      clearTimeout(automationTimeoutRef.current);
+      automationTimeoutRef.current = null;
+    }
 
     // Check if this step requires user action
     if (step.requireAction && step.selector) {
@@ -79,6 +105,25 @@ const PageTour = ({
       setupActionListener(step);
     } else {
       setWaitingForAction(false);
+    }
+
+    // Check if this step has automation delay
+    if (step.automationDelay) {
+      console.log(`[PageTour] Step ${stepIndex} has automation delay: ${step.automationDelay}ms`);
+      setWaitingForAutomation(true);
+
+      // If this step requires state monitoring (e.g., API call), don't set timeout
+      // The state monitoring useEffect will clear the waiting flag
+      if (!step.requiresStateMonitoring) {
+        // Set timeout to clear waiting state after automation completes
+        automationTimeoutRef.current = setTimeout(() => {
+          console.log(`[PageTour] Automation delay completed for step ${stepIndex}`);
+          setWaitingForAutomation(false);
+          automationTimeoutRef.current = null;
+        }, step.automationDelay);
+      }
+    } else {
+      setWaitingForAutomation(false);
     }
 
     if (step.selector) {
@@ -139,8 +184,9 @@ const PageTour = ({
   };
 
   const handleNext = () => {
-    // If waiting for user action, show message
-    if (waitingForAction) {
+    // If waiting for user action or automation, don't advance
+    if (waitingForAction || waitingForAutomation) {
+      console.log('[PageTour] Cannot advance - waiting for:', { waitingForAction, waitingForAutomation });
       return; // Don't advance
     }
 
@@ -244,11 +290,15 @@ const PageTour = ({
             <button
               className="tour-next-btn"
               onClick={handleNext}
-              disabled={waitingForAction}
+              disabled={waitingForAction || waitingForAutomation}
             >
               {currentStep < steps.length - 1
                 ? waitingForAction
                   ? 'Waiting...'
+                  : waitingForAutomation
+                  ? currentStepData.requiresStateMonitoring
+                    ? 'Loading...'
+                    : 'Automating...'
                   : 'Next'
                 : navigateToNext
                 ? 'Continue →'

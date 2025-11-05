@@ -459,6 +459,7 @@ const Dashboard = () => {
             title: "Goal Detail Modal Opens",
             description: "Watch as we automatically open the first sub-goal's detail modal! This shows AI progress analysis, distinctive word clouds (words unique to that goal), and all related journal entries. This is where goal mapping pays off!",
             selector: null,
+            automationDelay: 300, // Wait for goal modal to open
           },
           {
             icon: "📝",

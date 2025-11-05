@@ -720,6 +720,7 @@ const Chat = () => {
         navigateToNext="dashboard"
         pageTotalSteps={12}
         pageStartStep={9}
+        automationStates={{ showDiaryModal }}
         steps={[
           {
             icon: "💬",
@@ -738,6 +739,7 @@ const Chat = () => {
             title: "Meet Your Personas",
             description: "Watch as the persona selection modal opens! You can choose from 'Growth Mentor' for motivational support, 'Empathetic Listener' for emotional validation, 'Thoughtful Guide' for balanced reflection, or 'Analytical Coach' for structured thinking.",
             selector: null,
+            automationDelay: 300, // Wait for persona modal to open
           },
           {
             icon: "✍️",
@@ -756,6 +758,7 @@ const Chat = () => {
             title: "Select Messages",
             description: "After chatting, click 'Select Messages' to choose which parts of your conversation you want to save as a journal entry. Not every message needs to be saved - pick the most meaningful insights and reflections.",
             selector: ".control-button.select-button",
+            automationDelay: 300, // Wait for selection mode to enable
           },
           {
             icon: "✅",
@@ -763,12 +766,15 @@ const Chat = () => {
             description: "Checkboxes appear next to each message! Click to select the messages that capture important moments, breakthroughs, or reflections worth preserving. You can select as many or as few as you like.",
             selector: ".message-checkbox",
             waitForElement: true,
+            automationDelay: 300, // Wait for message auto-selection
           },
           {
             icon: "📔",
             title: "Convert to Diary",
             description: "Once you've selected messages, click 'Convert to Diary'. Our AI will transform your conversation into a well-structured journal entry with a clear narrative flow. It's like having a personal editor!",
             selector: null,
+            automationDelay: 500, // Initial delay, but will also monitor API state
+            requiresStateMonitoring: true, // Special flag for API call steps
           },
           {
             icon: "😊",
