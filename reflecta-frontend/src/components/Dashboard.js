@@ -495,8 +495,8 @@ const Dashboard = () => {
           {
             icon: "🔄",
             title: "The Complete Loop",
-            description: "• Set goals (Mandalart)\n• Chat with AI → Convert to journal\n• AI maps entries to goals\n• View analytics on Dashboard",
-            selector: null,
+            description: "👈 Look at the sidebar! See the workflow:\n• 1️⃣ Set goals (Mandalart)\n• 2️⃣ Chat with AI → Convert to journal\n• 3️⃣ View analytics on Dashboard\n\nEvery journal enriches your dashboard. Every goal gives context to reflections. It's a continuous growth system!",
+            selector: ".sidebar-nav",
           },
           {
             icon: "🎉",
