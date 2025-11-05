@@ -725,45 +725,45 @@ const Chat = () => {
           {
             icon: "💬",
             title: "Welcome to AI Chat & Journaling!",
-            description: "This is where reflection becomes natural conversation. Chat with our AI about your day, your thoughts, your progress - then convert those meaningful conversations into structured journal entries that map to your goals.",
+            description: "• Reflection through natural conversation\n• Chat about your day, thoughts & progress\n• Convert conversations to journal entries\n• Entries automatically map to your goals",
             selector: null,
           },
           {
             icon: "🎭",
             title: "Choose Your AI Companion",
-            description: "Click the persona button to select which AI companion you'd like to chat with. Each persona has a unique personality and communication style.",
+            description: "• Click persona button to select AI\n• Each has unique personality & style\n• Pick one that fits your needs\n• You can change it anytime",
             selector: ".control-button.persona-button",
           },
           {
             icon: "👥",
             title: "Meet Your Personas",
-            description: "Watch as the persona selection modal opens! You can choose from 'Growth Mentor' for motivational support, 'Empathetic Listener' for emotional validation, 'Thoughtful Guide' for balanced reflection, or 'Analytical Coach' for structured thinking.",
+            description: "• Growth Mentor: Motivational support\n• Empathetic Listener: Emotional validation\n• Thoughtful Guide: Balanced reflection\n• Analytical Coach: Structured thinking",
             selector: null,
             automationDelay: 300, // Wait for persona modal to open
           },
           {
             icon: "✍️",
             title: "Type Your Message",
-            description: "Start a conversation! Share what's on your mind - progress updates, challenges you're facing, insights you've gained, or questions about your goals. The AI will engage thoughtfully and help you reflect deeper.",
+            description: "• Start chatting naturally!\n• Share progress, challenges, insights\n• Ask questions about your goals\n• AI engages thoughtfully",
             selector: ".chat-input",
           },
           {
             icon: "🤖",
             title: "AI Responds Thoughtfully",
-            description: "The AI responds with empathy and insight! You can discuss anything - daily events, relationships, hobbies, challenges at work. While the AI is aware of your goals, conversations don't have to focus on them. It's about authentic reflection on your life.",
+            description: "• AI responds with empathy & insight\n• Discuss anything: work, life, hobbies\n• Aware of your goals, but not limited to them\n• Focus on authentic reflection",
             selector: ".chat-messages",
           },
           {
             icon: "☑️",
             title: "Select Messages",
-            description: "After chatting, click 'Select Messages' to choose which parts of your conversation you want to save as a journal entry. Not every message needs to be saved - pick the most meaningful insights and reflections.",
+            description: "• Click 'Select Messages' button\n• Choose parts to save as journal entry\n• Not every message needs saving\n• Pick most meaningful insights",
             selector: ".control-button.select-button",
             automationDelay: 300, // Wait for selection mode to enable
           },
           {
             icon: "✅",
             title: "Choose Your Messages",
-            description: "Checkboxes appear next to each message! Click to select the messages that capture important moments, breakthroughs, or reflections worth preserving. You can select as many or as few as you like.",
+            description: "• Checkboxes appear next to messages\n• Select important moments & insights\n• Capture breakthroughs & reflections\n• Choose as many or few as you like",
             selector: ".message-checkbox",
             waitForElement: true,
             automationDelay: 300, // Wait for message auto-selection
@@ -771,7 +771,7 @@ const Chat = () => {
           {
             icon: "📔",
             title: "Convert to Diary",
-            description: "Once you've selected messages, click 'Convert to Diary'. Our AI will transform your conversation into a well-structured journal entry with a clear narrative flow. It's like having a personal editor!",
+            description: "• Click 'Convert to Diary' button\n• AI transforms chat to journal entry\n• Creates clear narrative flow\n• Like having a personal editor!",
             selector: null,
             automationDelay: 500, // Initial delay, but will also monitor API state
             requiresStateMonitoring: true, // Special flag for API call steps
@@ -779,28 +779,28 @@ const Chat = () => {
           {
             icon: "😊",
             title: "Set Your Mood",
-            description: "In the diary modal, choose the mood that best reflects how you felt during this experience. Moods help track your emotional patterns over time and appear in your analytics visualizations.",
+            description: "• Choose mood in diary modal\n• Reflects how you felt during experience\n• Tracks emotional patterns over time\n• Appears in analytics visualizations",
             selector: ".diary-mood-selector",
             waitForElement: true,
           },
           {
             icon: "🎯",
             title: "Automatic Goal Mapping",
-            description: "Here's the magic: our AI automatically analyzes your journal entry and links it to relevant goals from your Mandalart! It identifies which sub-goals and tasks your reflection relates to. This connection powers all your progress insights.",
+            description: "• AI analyzes your journal entry\n• Links to relevant Mandalart goals\n• Identifies related sub-goals & tasks\n• Powers all your progress insights",
             selector: ".diary-textarea",
             waitForElement: true,
           },
           {
             icon: "💾",
             title: "Save to Database",
-            description: "Click 'Save to Journal' and your entry is permanently stored with all its goal mappings! It becomes part of your reflection history and contributes to AI-generated summaries, word clouds, and progress analytics.",
+            description: "• Click 'Save to Journal'\n• Entry stored with goal mappings\n• Becomes part of reflection history\n• Contributes to summaries & analytics",
             selector: ".save-button",
             waitForElement: true,
           },
           {
             icon: "📊",
             title: "Next: See Your Insights!",
-            description: "Now that you've journaled, head to the Dashboard to see the power of your reflections! View AI-generated summaries, distinctive word clouds for each sub-goal, emotional journey charts, and track how your journaling connects to goal progress.",
+            description: "• Head to Dashboard for insights\n• View AI-generated summaries\n• See distinctive word clouds per goal\n• Track emotional journey & progress",
             selector: null,
           },
         ]}

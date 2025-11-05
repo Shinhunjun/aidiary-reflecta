@@ -112,6 +112,7 @@
   line-height: 1.6;
   color: #cbd5e1;
   margin: 0;
+  white-space: pre-line; /* Preserve line breaks for bullet points */
 }
 
 .tour-tooltip-footer {
