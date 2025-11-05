@@ -179,13 +179,25 @@ const Dashboard = () => {
 
   // Tour mode: Auto-open goal summary modal for demonstration
   useEffect(() => {
+    console.log('[Dashboard Tour] Effect triggered:', {
+      tourActive,
+      currentTourStep,
+      showSummaryModal,
+      hasGoals: !!goals,
+      hasSubGoals: !!goals?.subGoals
+    });
+
     if (!tourActive || !currentTourStep) return;
     if (currentTourStep.pageId !== 'dashboard') return;
+
+    console.log('[Dashboard Tour] On correct page, step:', currentTourStep.stepIndex);
 
     // Step 3: Auto-open goal summary modal with first goal
     if (currentTourStep.stepIndex === 3 && !showSummaryModal && goals?.subGoals) {
       const firstGoalWithText = goals.subGoals.find((g) => g && g.text);
+      console.log('[Dashboard Tour] Step 3 - Found goal:', !!firstGoalWithText, 'Modal open:', showSummaryModal);
       if (firstGoalWithText) {
+        console.log('[Dashboard Tour] Auto-opening goal summary modal...');
         setTimeout(() => {
           handleGoalClick(firstGoalWithText);
         }, 300);
@@ -194,11 +206,12 @@ const Dashboard = () => {
 
     // Step 5 or later: Close modal if open and we've moved past modal steps
     if (currentTourStep.stepIndex >= 5 && showSummaryModal) {
+      console.log('[Dashboard Tour] Step 5+ - Auto-closing modal...');
       setTimeout(() => {
         setShowSummaryModal(false);
       }, 300);
     }
-  }, [tourActive, currentTourStep, goals, showSummaryModal]);
+  }, [tourActive, currentTourStep, goals, showSummaryModal, handleGoalClick]);
 
   const calculateGoalStats = () => {
     if (!goals || !goals.subGoals) {

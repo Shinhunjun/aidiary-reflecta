@@ -13,20 +13,29 @@
 /* Highlight Box */
 .tour-highlight {
   position: fixed;
-  border: 3px solid #6366f1;
-  border-radius: 8px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.15), 0 0 20px rgba(99, 102, 241, 0.5);
+  border: 5px solid #fbbf24;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5),
+              0 0 30px rgba(251, 191, 36, 0.8),
+              inset 0 0 20px rgba(251, 191, 36, 0.3);
   z-index: 9999;
   pointer-events: none;
   animation: pulse 2s ease-in-out infinite;
+  background: rgba(251, 191, 36, 0.05);
 }
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.15), 0 0 20px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(251, 191, 36, 0.8),
+                inset 0 0 20px rgba(251, 191, 36, 0.3);
+    border-color: #fbbf24;
   }
   50% {
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.15), 0 0 30px rgba(99, 102, 241, 0.8);
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5),
+                0 0 50px rgba(251, 191, 36, 1),
+                inset 0 0 30px rgba(251, 191, 36, 0.5);
+    border-color: #f59e0b;
   }
 }
 

@@ -96,6 +96,7 @@ export const TourProvider = ({ children }) => {
   };
 
   const updateCurrentTourStep = (pageId, stepIndex) => {
+    console.log('[TourContext] updateCurrentTourStep called:', { pageId, stepIndex });
     setCurrentTourStep({ pageId, stepIndex });
   };
 

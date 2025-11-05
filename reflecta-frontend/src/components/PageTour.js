@@ -108,6 +108,7 @@ const PageTour = ({
     }
 
     // Notify components of current tour step
+    console.log('[PageTour] Updating current tour step:', { page, stepIndex });
     updateCurrentTourStep(page, stepIndex);
   };
 

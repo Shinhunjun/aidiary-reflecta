@@ -140,22 +140,36 @@ const Chat = () => {
 
   // Tour mode: Auto-enable selection and show diary modal
   useEffect(() => {
+    console.log('[Chat Tour] Effect triggered:', {
+      tourActive,
+      currentTourStep,
+      isSelectMode,
+      showDiaryModal,
+      messageCount: messages.length
+    });
+
     if (!tourActive || !currentTourStep) return;
     if (currentTourStep.pageId !== 'chat') return;
 
+    console.log('[Chat Tour] On correct page, step:', currentTourStep.stepIndex);
+
     // Step 7: Auto-enable selection mode and select first 2 user messages
     if (currentTourStep.stepIndex === 7 && !isSelectMode) {
+      console.log('[Chat Tour] Step 7 - Auto-enabling selection mode...');
       setTimeout(() => {
         setIsSelectMode(true);
         const userMessages = messages.filter(m => m.sender === 'user');
+        console.log('[Chat Tour] Found user messages:', userMessages.length);
         if (userMessages.length >= 2) {
           setSelectedMessages([userMessages[0].id, userMessages[1].id]);
+          console.log('[Chat Tour] Selected 2 messages');
         }
       }, 300);
     }
 
     // Step 9: Auto-open diary modal with demo content
     if (currentTourStep.stepIndex === 9 && !showDiaryModal) {
+      console.log('[Chat Tour] Step 9 - Auto-opening diary modal...');
       setTimeout(() => {
         setDiaryContent(
           "Today was a productive day working on my goals. I had a meaningful conversation with my AI assistant about my career aspirations and personal growth. I realized that breaking down my goals into smaller tasks makes them feel more achievable. I'm excited to see my progress over time!"
@@ -172,12 +186,13 @@ const Chat = () => {
 
     // Step 11 or later: Close diary modal if open
     if (currentTourStep.stepIndex >= 11 && showDiaryModal) {
+      console.log('[Chat Tour] Step 11+ - Auto-closing diary modal...');
       setTimeout(() => {
         setShowDiaryModal(false);
         clearSelection();
       }, 300);
     }
-  }, [tourActive, currentTourStep, messages, isSelectMode, showDiaryModal]);
+  }, [tourActive, currentTourStep, messages, isSelectMode, showDiaryModal, clearSelection]);
 
   // 대화 초기화 함수
   const resetMessages = () => {

@@ -523,16 +523,27 @@ const GoalSetting = () => {
 
   // Tour mode: Auto-expand grid for specific steps
   useEffect(() => {
+    console.log('[GoalSetting Tour] Effect triggered:', {
+      tourActive,
+      currentTourStep,
+      expandedGoal: !!expandedGoal,
+      hasMainMandalart: !!mainMandalart
+    });
+
     if (!tourActive || !currentTourStep) return;
     if (currentTourStep.pageId !== 'goal-setting') return;
+
+    console.log('[GoalSetting Tour] On correct page, step:', currentTourStep.stepIndex);
 
     // Step 5: Auto-expand first sub-goal to show 3x3 detail grid
     if (currentTourStep.stepIndex === 5 && mainMandalart?.subGoals) {
       const firstGoalWithText = mainMandalart.subGoals.find(
         (g) => g && g.text && g.id !== mainMandalart.id
       );
+      console.log('[GoalSetting Tour] Step 5 - Found goal:', !!firstGoalWithText, 'Expanded:', !!expandedGoal);
       if (firstGoalWithText && !expandedGoal) {
         // Small delay to ensure DOM is ready
+        console.log('[GoalSetting Tour] Auto-expanding first sub-goal...');
         setTimeout(() => {
           zoomIn(firstGoalWithText, 0, mainMandalart.id, 0);
         }, 300);
@@ -541,11 +552,12 @@ const GoalSetting = () => {
 
     // Step 7 or later: Close expanded view if still open
     if (currentTourStep.stepIndex >= 7 && expandedGoal) {
+      console.log('[GoalSetting Tour] Step 7+ - Auto-closing expanded view...');
       setTimeout(() => {
         zoomOut();
       }, 300);
     }
-  }, [tourActive, currentTourStep, mainMandalart, expandedGoal]);
+  }, [tourActive, currentTourStep, mainMandalart, expandedGoal, zoomIn, zoomOut]);
 
   // Toggle goal completion function removed
 
