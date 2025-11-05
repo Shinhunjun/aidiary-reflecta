@@ -109,7 +109,7 @@ const DemoLanding = () => {
         "Track progress across all 64 actionable tasks",
         "Pre-loaded demo with complete goal structure"
       ],
-      screenshot: "/screenshots/mandalart-grid.png",
+      screenshot: "/screenshots/mandalart-grid.webp",
       imageAlt: "Mandalart 9x9 goal-setting grid"
     },
     {
@@ -124,7 +124,7 @@ const DemoLanding = () => {
         "Plus Mindfulness Guide & Balanced All-Rounder",
         "Create unlimited custom personas"
       ],
-      screenshot: "/screenshots/personas-selector.png",
+      screenshot: "/screenshots/personas-selector.webp",
       imageAlt: "AI Persona selection interface"
     },
     {
@@ -140,12 +140,12 @@ const DemoLanding = () => {
       ],
       screenshots: [
         {
-          url: "/screenshots/chat-interface.png",
+          url: "/screenshots/chat-interface.webp",
           alt: "AI chat conversation interface",
           caption: "Step 1: Chat naturally with AI"
         },
         {
-          url: "/screenshots/diary-converted.png",
+          url: "/screenshots/diary-converted.webp",
           alt: "Converted diary entry with goal mapping",
           caption: "Step 2: Instant diary conversion"
         }
@@ -162,7 +162,7 @@ const DemoLanding = () => {
         "Progress charts and timeline views",
         "Search and filter by mood, tags, or goals"
       ],
-      screenshot: "/screenshots/ai-insights.png",
+      screenshot: "/screenshots/ai-insights.webp",
       imageAlt: "AI insights dashboard with word cloud and charts"
     }
   ];
@@ -318,6 +318,7 @@ const DemoLanding = () => {
                           <img
                             src={screenshot.url}
                             alt={screenshot.alt}
+                            loading="lazy"
                             onError={(e) => {
                               e.target.style.display = 'none';
                               e.target.nextSibling.style.display = 'flex';
@@ -341,6 +342,7 @@ const DemoLanding = () => {
                     <img
                       src={feature.screenshot}
                       alt={feature.imageAlt}
+                      loading="lazy"
                       onError={(e) => {
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';

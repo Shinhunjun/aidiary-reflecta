@@ -185,3 +185,252 @@ Located in `reflecta-backend/`:
 - Always test with the full 3-level Mandalart hierarchy
 - Update progress calculation logic if changing completion tracking
 - Verify that GoalSetting.js UI handles the changes correctly
+
+## Demo Landing Page (DemoLanding.js)
+
+### Purpose
+The Demo Landing Page serves as the primary marketing page for the LIKELION US 'AI Agents' Ideathon submission. It showcases Reflecta's value proposition, features, business model, and roadmap to potential investors, judges, and users.
+
+### Component Structure
+
+Located at `reflecta-frontend/src/components/DemoLanding.js` with styles in `DemoLanding.css`.
+
+#### Key Sections (in order):
+1. **Hero Section**: Main value proposition and CTA
+2. **Problem Statement**: "The Journaling Dilemma" - addresses pain points
+3. **Why Reflecta?**: Core differentiators and unique selling points
+4. **User Storyboard** (4 scenes):
+   - Scene 1: New User (pain point: giving up on traditional journaling)
+   - Scene 2: Set Goals (Mandalart framework visualization)
+   - Scene 3: Chat-to-Diary (conversational journaling)
+   - Scene 4: Auto Diary (conversion with emoji: 💬 → 📔)
+5. **How It Works**: Step-by-step user flow
+6. **Business Model & Market**:
+   - Monetization Model (pricing tiers with ad-supported free tier)
+   - Go-to-Market Channels (2x2 grid layout)
+   - TAM/SAM/SOM projections
+7. **Technical Innovation**: OpenAI integration details
+8. **Competitive Analysis**: Comparison table
+9. **Roadmap**: 4-quarter timeline (Q1 2025 - Q2 2026)
+10. **Team**: Founder information
+11. **Final CTA**: Guided tour button with animations
+
+### Important Patterns
+
+#### Storyboard Content Guidelines
+- **Scene 1** must emphasize the core pain point: Traditional journaling feels like a chore and leads to abandonment
+- **Scene 4** should visually show transformation using arrow notation (💬 → 📔) to illustrate chat-to-diary conversion
+- Keep storyboard text concise and relatable to target demographic (students, young professionals)
+
+#### Monetization Model Structure
+```javascript
+// Three-tier model with ad-supported free tier
+Free Tier: $0
+  - Ad-supported (non-intrusive sidebar ads)
+  - Basic features with limitations
+
+Premium Tier: $9.99/mo
+  - Ad-free experience (first benefit listed)
+  - All advanced features
+
+Enterprise Tier: Custom pricing
+  - Ad-free for all users
+  - Counselor features and admin controls
+```
+
+**Why this matters**: Ad-supported free tier creates revenue stream while lowering barrier to entry. Always list "ad-free" as the first premium benefit to justify price point.
+
+#### Roadmap Consolidation Strategy
+- Keep timeline realistic and near-term focused (4 quarters max)
+- Consolidate advanced features into Q1 to demonstrate technical capability
+- Q1 2025 should be highlighted with `demo-roadmap-highlight` class
+- Avoid distant future promises (Q3-Q4 2026+) that appear speculative
+
+Example structure:
+```
+Q1 2025: 🚀 Beta Launch & AI Features (highlighted)
+Q2 2025: Revenue & Growth
+Q3 2025: Expand Features
+Q4 2025 - Q2 2026: Scale & Expand
+```
+
+#### CTA Button Optimization
+
+**Location**: Final section before footer, after all content
+
+**Key Elements**:
+1. **Subtitle with time commitment**: "✨ Try our interactive demo — see it in action in just 3 minutes"
+2. **Benefit-driven button text**: "Try Interactive Demo (3 min)" instead of generic "Start Tour"
+3. **Animated rocket icon**: `<span className="demo-cta-icon">🚀</span>` with bounce animation
+4. **Button pulse animation**: Continuous attention-grabbing pulse effect
+
+**CSS Implementation**:
+```css
+/* Pulse effect - runs continuously */
+.demo-cta-pulse {
+  animation: ctaPulse 2s ease-in-out infinite;
+}
+
+@keyframes ctaPulse {
+  0%, 100% {
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 12px 48px rgba(99, 102, 241, 0.6),
+                0 0 0 8px rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+  }
+}
+
+/* Stop animation on hover for better UX */
+.demo-cta-pulse:hover {
+  animation: none;
+  box-shadow: 0 16px 64px rgba(99, 102, 241, 0.5) !important;
+  transform: translateY(-4px) scale(1.02) !important;
+}
+
+/* Icon bounce - independent animation */
+.demo-cta-icon {
+  animation: iconBounce 1s ease-in-out infinite;
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+```
+
+**CTA Best Practices**:
+- Always include specific time commitment ("3 min") to reduce uncertainty
+- Use action-oriented verbs ("Try" has lower friction than "Start")
+- Add subtle animations that pause on hover (prevents annoyance)
+- Include value proposition in subtitle before button
+- Make mobile-responsive with adjusted font sizes
+
+#### Grid Layout Conventions
+
+**Go-to-Market Channels Section**: Uses explicit 2x2 grid instead of auto-fit
+
+```css
+.demo-marketing-channels {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);  /* Explicit 2 columns */
+  gap: 25px;
+}
+```
+
+**Why not auto-fit?**: `repeat(auto-fit, minmax(280px, 1fr))` can create inconsistent layouts on different screen sizes. For marketing content that must look professional on all devices, explicit column counts provide better control.
+
+**When to use each**:
+- `repeat(2, 1fr)`: Marketing content, comparison tables, feature grids with exact layout requirements
+- `repeat(auto-fit, minmax())`: Dynamic content lists where item count varies
+
+#### Animation Guidelines
+
+**Framer Motion Integration**: All major sections use `initial="hidden" animate="visible" variants={containerVariants}`
+
+**Standard animation variants**:
+```javascript
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2 }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
+```
+
+**Use animations sparingly**: Only for initial page load, scroll-triggered reveals, and primary CTAs. Avoid constant animations that distract from content.
+
+### Tour Integration
+
+Demo Landing Page includes `PageTour` component for guided walkthrough:
+
+```javascript
+<PageTour
+  page="demo"
+  steps={demoSteps}
+  onComplete={() => {
+    localStorage.setItem('demo_tour_completed', 'true');
+    navigate('/goal-setting');
+  }}
+  navigateToNext="goal-setting"
+  pageTotalSteps={6}
+  pageStartStep={0}
+/>
+```
+
+**Tour Context Integration**: Uses `TourContext` to coordinate multi-page tours. See [PageTour.js](reflecta-frontend/src/components/PageTour.js:1) for implementation details.
+
+### Responsive Design
+
+**Breakpoints**:
+- Desktop: Default styles
+- Tablet: `@media (max-width: 1024px)`
+- Mobile: `@media (max-width: 768px)`
+
+**Mobile-specific adjustments**:
+- Hero font sizes: h2 from 48px → 36px
+- Feature grids: 3 columns → 1 column
+- Pricing cards: Side-by-side → stacked
+- CTA subtitle: 18px → 16px
+- Marketing channels: 2x2 grid → 1 column
+
+### Common Modifications
+
+**Updating Storyboard Scenes**:
+1. Locate scene in DemoLanding.js (around lines 490-550)
+2. Update quote text to reflect user pain points
+3. Update icon if showing transformation (use arrow notation: 💬 → 📔)
+4. Keep descriptions under 2 sentences for readability
+
+**Adding New Pricing Tier**:
+1. Duplicate a `demo-pricing-card` div
+2. Update badge, price, features list
+3. Ensure "ad-free" benefit is listed first for paid tiers
+4. Add tier to mobile responsive section if needed
+
+**Modifying Roadmap**:
+1. Keep total quarters to 4 or fewer
+2. Use `demo-roadmap-highlight` class for current/next quarter
+3. Group similar features under single milestone
+4. Avoid distant dates (1+ years out) that seem speculative
+
+**Changing CTA**:
+1. Update both subtitle and button text together
+2. Test time commitment accuracy ("3 min" should be realistic)
+3. Verify animations work smoothly (pulse + icon bounce)
+4. Check mobile responsiveness of new text length
+
+### Ideathon-Specific Considerations
+
+**Target Audience**: Judges and potential investors evaluating:
+- Problem-solution fit
+- Market opportunity size
+- Technical feasibility
+- Business model viability
+- Team execution capability
+
+**Content Priorities**:
+1. Clear problem statement that resonates emotionally
+2. Unique solution that's technically impressive but explained simply
+3. Realistic roadmap showing near-term execution capability
+4. Viable monetization model with multiple revenue streams
+5. Compelling CTA that lets judges experience the product
+
+**Avoid**:
+- Overly technical jargon without context
+- Unrealistic timelines (distant future features)
+- Missing pain points (why users would switch from competitors)
+- Generic value propositions without specificity
+- Weak CTAs that don't invite interaction
