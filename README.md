@@ -4,7 +4,7 @@ Reflecta is an intelligent journaling application that helps users with self-ref
 
 ## Live Demo
 
-**Frontend (Vercel)**: [https://aidiary-reflecta.vercel.app](https://aidiary-reflecta.vercel.app)
+**Frontend (Vercel)**: [https://aidiary-reflecta.vercel.app](https://aidiary-reflecta.vercel.app/demo)
 
 **Backend API (Google Cloud Run)**: https://reflecta-backend-762303020827.us-central1.run.app
 
