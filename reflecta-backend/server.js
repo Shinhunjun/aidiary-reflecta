@@ -140,8 +140,7 @@ const analyzeGoalMapping = async (userId, content) => {
     const goalsContext = flattenedGoals
       .map(
         (goal) =>
-          `- ${goal.type.toUpperCase()}: "${goal.text}" (ID: ${goal.id})${
-            goal.description ? ` - ${goal.description}` : ""
+          `- ${goal.type.toUpperCase()}: "${goal.text}" (ID: ${goal.id})${goal.description ? ` - ${goal.description}` : ""
           }`
       )
       .join("\n");
@@ -169,7 +168,7 @@ Only match if confidence is above 0.3. Be conservative.`;
 
     const response = await fetch(
       process.env.OPENAI_API_URL ||
-        "https://api.openai.com/v1/chat/completions",
+      "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -610,7 +609,7 @@ app.post(
             goalId: finalRelatedGoalId,
             subGoalId:
               finalRelatedGoalType === "sub" ||
-              finalRelatedGoalType === "sub-sub"
+                finalRelatedGoalType === "sub-sub"
                 ? finalRelatedGoalId
                 : null,
             progressType: "reflection",
@@ -640,11 +639,11 @@ app.post(
         entry,
         goalMapping: finalRelatedGoalId
           ? {
-              goalId: finalRelatedGoalId,
-              goalType: finalRelatedGoalType,
-              confidence: mappingConfidence,
-              reason: mappingReason,
-            }
+            goalId: finalRelatedGoalId,
+            goalType: finalRelatedGoalType,
+            confidence: mappingConfidence,
+            reason: mappingReason,
+          }
           : null,
       });
     } catch (error) {
@@ -1558,7 +1557,7 @@ app.get(
           entryCount: progressEntries.length,
           daysSinceStart: Math.floor(
             (new Date() - new Date(progressEntries[progressEntries.length - 1].date)) /
-              (1000 * 60 * 60 * 24)
+            (1000 * 60 * 60 * 24)
           ),
         },
       };
@@ -2371,9 +2370,8 @@ app.post("/api/convert-to-diary", authenticateToken, async (req, res) => {
         else if (goal.type === "sub") prefix = "  SUB GOAL";
         else if (goal.type === "sub-sub") prefix = "    SUB-SUB GOAL";
 
-        return `${prefix}: "${goal.text}" (ID: ${goal.id})${
-          goal.description ? ` - ${goal.description}` : ""
-        }`;
+        return `${prefix}: "${goal.text}" (ID: ${goal.id})${goal.description ? ` - ${goal.description}` : ""
+          }`;
       })
       .join("\n");
 
@@ -2432,7 +2430,7 @@ Only match goals if confidence is above 0.3. Be conservative - it's better to no
 
     const response = await fetch(
       process.env.OPENAI_API_URL ||
-        "https://api.openai.com/v1/chat/completions",
+      "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -2575,8 +2573,7 @@ app.post("/api/analyze-goal-mapping", authenticateToken, async (req, res) => {
     const goalsContext = flattenedGoals
       .map(
         (goal) =>
-          `- ${goal.type.toUpperCase()}: "${goal.text}" (ID: ${goal.id})${
-            goal.description ? ` - ${goal.description}` : ""
+          `- ${goal.type.toUpperCase()}: "${goal.text}" (ID: ${goal.id})${goal.description ? ` - ${goal.description}` : ""
           }`
       )
       .join("\n");
@@ -2615,7 +2612,7 @@ Only match if confidence is above 0.3. Be conservative - it's better to not matc
 
     const response = await fetch(
       process.env.OPENAI_API_URL ||
-        "https://api.openai.com/v1/chat/completions",
+      "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -2964,15 +2961,14 @@ The user will provide a goal description. Your task is to:
 2. Suggest 8 distinct, actionable primary objectives that directly contribute to the main goal.
 3. Format your response clearly, with the main goal first, followed by the 8 primary objectives. Use bullet points for objectives.`;
 
-    const userPrompt = `Help me break down this goal into a Mandalart: "${description.trim()}"${
-      dueDate
+    const userPrompt = `Help me break down this goal into a Mandalart: "${description.trim()}"${dueDate
         ? ` with a due date of ${new Date(dueDate).toLocaleDateString()}`
         : ""
-    }`;
+      }`;
 
     const response = await fetch(
       process.env.OPENAI_API_URL ||
-        "https://api.openai.com/v1/chat/completions",
+      "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -3071,9 +3067,8 @@ app.post("/api/chat/enhanced", authenticateToken, async (req, res) => {
         if (goalProgress.length > 0) {
           goalContext += `  Recent progress:\n`;
           goalProgress.slice(0, 3).forEach((progress) => {
-            goalContext += `    • ${
-              progress.title
-            } (${progress.date.toLocaleDateString()})\n`;
+            goalContext += `    • ${progress.title
+              } (${progress.date.toLocaleDateString()})\n`;
           });
         }
 
@@ -3098,7 +3093,7 @@ app.post("/api/chat/enhanced", authenticateToken, async (req, res) => {
 
     const response = await fetch(
       process.env.OPENAI_API_URL ||
-        "https://api.openai.com/v1/chat/completions",
+      "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -3843,8 +3838,8 @@ app.get(
               shareLevel === "summary"
                 ? alert.aiAnalysis.summary
                 : shareLevel === "moderate"
-                ? alert.aiAnalysis.summary
-                : alert.aiAnalysis,
+                  ? alert.aiAnalysis.summary
+                  : alert.aiAnalysis,
           })),
           total: recentAlerts.length,
         },
@@ -3953,7 +3948,6 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something went wrong!" });
@@ -3964,6 +3958,16 @@ app.use("*", (req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// Create HTTP server and integrate WebSocket
+const http = require("http");
+const { initializeWebSocketServer } = require("./websocket");
+
+const server = http.createServer(app);
+
+// Initialize WebSocket server
+initializeWebSocketServer(server);
+
+server.listen(PORT, () => {
+  console.log(`HTTP Server running on port ${PORT}`);
+  console.log(`WebSocket Server available at ws://localhost:${PORT}/ws/gemini-live`);
 });

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Live WebSocket Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .status.disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status.connected {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #1565c0;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #fafafa;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .message.user {
+            background: #e3f2fd;
+            text-align: right;
+        }
+        .message.ai {
+            background: #f3e5f5;
+        }
+        .message.system {
+            background: #fff3e0;
+            font-style: italic;
+            text-align: center;
+        }
+        .message.function {
+            background: #e0f2f1;
+            border-left: 3px solid #00897b;
+        }
+        .message-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Gemini Live WebSocket Test</h1>
+        
+        <div id="status" class="status disconnected">
+            Status: Disconnected
+        </div>
+
+        <div class="input-group">
+            <label for="token">JWT Token (from login):</label>
+            <input type="text" id="token" placeholder="Paste your JWT token here">
+        </div>
+
+        <div class="input-group">
+            <button id="connectBtn" onclick="connect()">Connect</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>Disconnect</button>
+        </div>
+
+        <div class="chat-container" id="chat">
+            <div class="message system">
+                <div class="message-label">Welcome</div>
+                Enter your JWT token and click Connect to start a voice journaling session.
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="message">Type a message (testing without audio):</label>
+            <input type="text" id="message" placeholder="e.g., I want to write about my day" onkeypress="handleKeyPress(event)">
+            <button id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+
+        function connect() {
+            const token = document.getElementById('token').value.trim();
+            if (!token) {
+                alert('Please enter a JWT token');
+                return;
+            }
+
+            const wsUrl = `ws://localhost:5001/ws/gemini-live?token=${encodeURIComponent(token)}`;
+            
+            try {
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => {
+                    updateStatus('Connected', true);
+                    addMessage('system', 'System', 'WebSocket connection established');
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                    document.getElementById('sendBtn').disabled = false;
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleServerMessage(data);
+                    } catch (error) {
+                        console.error('Error parsing message:', error);
+                    }
+                };
+
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    addMessage('system', 'Error', 'Connection error occurred');
+                };
+
+                ws.onclose = (event) => {
+                    updateStatus('Disconnected', false);
+                    addMessage('system', 'System', `Connection closed (Code: ${event.code})`);
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                };
+
+            } catch (error) {
+                alert('Connection failed: ' + error.message);
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.send(JSON.stringify({ type: 'end_session' }));
+                ws.close();
+                ws = null;
+            }
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('message');
+            const text = messageInput.value.trim();
+            
+            if (!text || !ws || ws.readyState !== WebSocket.OPEN) {
+                return;
+            }
+
+            addMessage('user', 'You', text);
+            
+            ws.send(JSON.stringify({
+                type: 'text_message',
+                data: { text }
+            }));
+
+            messageInput.value = '';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function handleServerMessage(data) {
+            console.log('Received:', data);
+
+            switch (data.type) {
+                case 'connected':
+                    addMessage('system', 'System', data.message);
+                    if (data.context) {
+                        addMessage('system', 'Context', 
+                            `Recent journals: ${data.context.recentJournals.length}, ` +
+                            `Goals: ${data.context.goals.length}`
+                        );
+                    }
+                    break;
+
+                case 'ai_response':
+                    addMessage('ai', 'AI Assistant', data.text);
+                    break;
+
+                case 'function_call':
+                    addMessage('function', 'Function Call', 
+                        `Calling: ${data.function}\nArguments: ${JSON.stringify(data.args, null, 2)}`
+                    );
+                    break;
+
+                case 'function_result':
+                    addMessage('function', 'Function Result', 
+                        `${data.function}: ${JSON.stringify(data.result, null, 2)}`
+                    );
+                    break;
+
+                case 'error':
+                    addMessage('system', 'Error', data.error);
+                    break;
+
+                default:
+                    console.log('Unknown message type:', data.type);
+            }
+        }
+
+        function addMessage(type, label, content) {
+            const chat = document.getElementById('chat');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.innerHTML = `
+                <div class="message-label">${label}</div>
+                <div>${content}</div>
+            `;
+            chat.appendChild(messageDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function updateStatus(text, connected) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = `Status: ${text}`;
+            statusDiv.className = `status ${connected ? 'connected' : 'disconnected'}`;
+        }
+    </script>
+</body>
+</html>
