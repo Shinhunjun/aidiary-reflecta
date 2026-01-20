@@ -45,10 +45,10 @@ const initializeWebSocketServer = (server) => {
             return;
         }
 
-        // Initialize session state
+        //Initialize session state
         const session = {
             userId,
-            conversationHistory: [],
+            chat: null,
             geminiClient: null
         };
 
@@ -153,12 +153,6 @@ const handleMessage = async (ws, session, message) => {
  */
 const handleTextMessage = async (ws, session, text) => {
     try {
-        // Add to conversation history
-        session.conversationHistory.push({
-            role: "user",
-            content: text
-        });
-
         // Initialize Gemini if not already done
         if (!session.geminiClient) {
             const genAI = initializeGemini();
@@ -171,25 +165,19 @@ const handleTextMessage = async (ws, session, text) => {
                 model: "gemini-2.0-flash-exp",
                 tools: [{ functionDeclarations }],
                 systemInstruction: `You are a helpful AI journaling assistant. Help users reflect on their day, set goals, and track their progress. 
-        
-You can:
-- Create journal entries from conversations
-- Search past journal entries
-- View and discuss user goals
 
-User's recent activity:
-${JSON.stringify(session.context || {}, null, 2)}
-
-Be conversational, empathetic, and encouraging. When the user shares thoughts worth saving, offer to create a journal entry.`
+When the user provides enough details about their day (mood, what they did, how they feel), call create_journal_entry to save their reflection.
+Ask clarifying questions if needed to get title, content, mood, and relevant tags.
+Be conversational, empathetic, and encouraging.`
             });
         }
 
-        // Send message to Gemini
-        const chat = session.geminiClient.startChat({
-            history: session.conversationHistory.slice(0, -1) // Exclude the message we just added
-        });
+        // Start or continue chat (SDK manages history internally)
+        if (!session.chat) {
+            session.chat = session.geminiClient.startChat({});
+        }
 
-        const result = await chat.sendMessage(text);
+        const result = await session.chat.sendMessage(text);
         const response = result.response;
 
         // Check if Gemini wants to call a function
@@ -215,19 +203,14 @@ Be conversational, empathetic, and encouraging. When the user shares thoughts wo
             }));
 
             // Get AI's final response incorporating the function result
-            const followUpResult = await chat.sendMessage({
+            const followUpResult = await session.chat.sendMessage([{
                 functionResponse: {
                     name: functionCall.name,
                     response: functionResult
                 }
-            });
+            }]);
 
             const finalResponse = followUpResult.response.text();
-
-            session.conversationHistory.push({
-                role: "assistant",
-                content: finalResponse
-            });
 
             ws.send(JSON.stringify({
                 type: "ai_response",
@@ -237,11 +220,6 @@ Be conversational, empathetic, and encouraging. When the user shares thoughts wo
         } else {
             // Regular text response
             const aiResponse = response.text();
-
-            session.conversationHistory.push({
-                role: "assistant",
-                content: aiResponse
-            });
 
             ws.send(JSON.stringify({
                 type: "ai_response",
